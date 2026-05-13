@@ -1,9 +1,8 @@
 /* tasks.html — 统一时间线 (mini_task | dispatch 切换), accordion 展开 */
 
 .tasks-wrap {
-  padding: 8px;
-  max-width: 1100px;
-  margin: 0 auto;
+  padding: 0;
+  margin: 0;
 }
 
 /* mode tab + filter 顶部 */

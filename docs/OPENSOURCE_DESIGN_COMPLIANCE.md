@@ -100,15 +100,17 @@ Courier New / Courier.
 | `macOS 原生` (Tauri 描述) | `跨平台原生 (macOS/Linux/Windows)` |
 | `适合 macOS app 风格` | `适合通用桌面 app 风格` |
 
-### 3.3 窗口 chrome 圆点 (title-bar 流量灯)
+### 3.3 窗口 chrome — 整套 macOS-window 视觉已删除
 
-形态保留 (横排 3 个小圆点是通用 window/cli chrome 元素, 多个开源 terminal 模拟器
-也采用), 但 **配色 + 尺寸** 与任何特定平台脱钩:
+第二轮 hardening 整套删除 `.terminal` + `.title-bar` + `.wc/.wb/.bc/.bm/.bx` + `.tt`
+class. 不再有圆角窗口 + 投影 + 居中标题 + 3 圆点流量灯. 改用 IDE 风扁平 `.appbar`:
 
-- 配色: 统一 `var(--dim)` 中性灰. **严禁** 复刻 Apple 流量灯的 `#ff5f57 / #ffbd2e
-  / #28c940` (同时满足项目本身的 "严禁红绿" 规则 — 用户红绿色弱).
-- 尺寸: 12px → **10px** (避开 macOS Terminal 标志性的 12-13px 尺寸).
-- CSS 注释明确写出 "通用 window/cli 范式, 非任何特定平台独占".
+- `<header class="appbar">` 平直 1px 下边界, **无圆角无阴影**.
+- 左 `.brand` (蓝色加粗 brand 名) + `.ctx` (当前页 dim 标签).
+- 右 token mask + master health + clock.
+- **不再有任何形态可被关联到 macOS Terminal / Finder window chrome**.
+
+详细规范见 [`VISUAL_STYLE_GUIDE.md §4`](./VISUAL_STYLE_GUIDE.md).
 
 ---
 

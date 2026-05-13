@@ -1,9 +1,8 @@
 /* notifications.html — mobile_audit 历史 UI () */
 
 .notif-wrap {
-  padding: 8px;
-  max-width: 1400px;
-  margin: 0 auto;
+  padding: 0;
+  margin: 0;
 }
 
 /* banner: stale / fail / 429 */

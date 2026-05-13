@@ -22,6 +22,15 @@ master 当 CEO 操控台. 在这个仓库工作时遵循以下硬约束.
    filter 等) 仍走 sessionStorage (`ssGet/ssSet`), 不混用.
 6. **fetch 永远相对路径** `./api/v1/...`, 严禁硬编码 master URL.
 7. **不依赖 WebSocket**: 全程轮询 (5s 心跳/agent 列表).
+8. **填满优先, 容器零 padding/margin (导航/列/壳类)**:
+   - **导航/容器/列** (`.appbar`/`.tab-bar`/`.agents-layout`/`.node-col`/`.list-panel` 等)
+     一律贴边 (`padding: 0; margin: 0;`), 严禁 `max-width` + `margin: auto` 居中范式.
+     顶 bar / tab-bar / 分组列 / 主区域均贴 viewport 边.
+   - **leaf 项目** (`.tab`/`.agent-row`/`.node-tab`) 仅为可点/可读最小必要 padding
+     (e.g. `.tab` 6px 10px, `.node-tab` 1px 4px 1px 2px).
+   - **文本/cli 输出区** (`.term-page` settings/usage 等) 是 leaf-content 而非容器, 保留
+     可读 padding (~8-12px), 不强制贴边.
+   - 总则: 不为视觉留白而加 padding/margin; 凡能填满就填满.
 
 ## 部署模型
 

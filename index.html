@@ -16,33 +16,28 @@
 <link rel="stylesheet" href="css/usage.css">
 </head>
 <body>
-<!-- SPA shell: 一个 .terminal 同时罩住 title-bar + tab-bar + #app-content (fn_fe curve 范式).
-     不再拆两个独立 box, 视觉是连续的一整个终端窗口. -->
-<div class="terminal" id="appbar-frame">
-  <div class="title-bar">
-    <div class="wc">
-      <span class="wb bc"></span>
-      <span class="wb bm"></span>
-      <span class="wb bx"></span>
-    </div>
-    <span class="tt" id="appbar-title">pre · CEO — home — zsh</span>
-    <span id="appbar-token" class="ts">token: -</span>
-    <span id="appbar-health" class="health">master ?</span>
-    <span id="appbar-clock" class="ts"></span>
-  </div>
-  <div class="tab-bar" id="tab-bar">
-    <a href="#agents"        class="tab active" data-route="agents">agents</a>
-    <a href="#usage"         class="tab"        data-route="usage">usage</a>
-    <a href="#settings"      class="tab"        data-route="settings">settings</a>
-    <!-- 暂时隐藏 (恢复: 取消注释 + 同步 shared/router.js TABS / DEFAULT)
-    <a href="#home"          class="tab"        data-route="home">home</a>
-    <a href="#tasks"         class="tab"        data-route="tasks">tasks</a>
-    <a href="#dispatches"    class="tab"        data-route="dispatches">dispatches</a>
-    <a href="#notifications" class="tab"        data-route="notifications">notifications</a>
-    -->
-  </div>
-  <div id="app-content" class="terminal-body"></div>
-</div>
+<!-- SPA shell: 扁平 IDE 风 — header.appbar + nav.tab-bar + main#app-content.
+     不再用 macOS-style window 外壳 (圆角/阴影/流量灯), 已脱钩任何桌面 OS 视觉范式. -->
+<header class="appbar">
+  <span class="brand">pre · CEO</span>
+  <span class="ctx" id="appbar-title">agents</span>
+  <span class="grow"></span>
+  <span id="appbar-token" class="ts">token: -</span>
+  <span id="appbar-health" class="health">master ?</span>
+  <span id="appbar-clock" class="ts"></span>
+</header>
+<nav class="tab-bar" id="tab-bar">
+  <a href="#agents"        class="tab active" data-route="agents">agents</a>
+  <a href="#usage"         class="tab"        data-route="usage">usage</a>
+  <a href="#settings"      class="tab"        data-route="settings">settings</a>
+  <!-- 暂时隐藏 (恢复: 取消注释 + 同步 shared/router.js TABS / DEFAULT)
+  <a href="#home"          class="tab"        data-route="home">home</a>
+  <a href="#tasks"         class="tab"        data-route="tasks">tasks</a>
+  <a href="#dispatches"    class="tab"        data-route="dispatches">dispatches</a>
+  <a href="#notifications" class="tab"        data-route="notifications">notifications</a>
+  -->
+</nav>
+<main id="app-content" class="terminal-body"></main>
 
 <script src="shared/vendor/dompurify.min.js"
         integrity="sha384-eEu5CTj3qGvu9PdJuS+YlkNi7d2XxQROAFYOr59zgObtlcux1ae1Il3u7jvdCSWu"

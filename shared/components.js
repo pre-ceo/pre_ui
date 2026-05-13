@@ -97,7 +97,7 @@
     return `<span class="pill ${cls}" title="${U.esc(s)}">${U.esc(SHORT[s] || s)}</span>`;
   }
 
-  // --- App bar (fn_fe curve 范式: .terminal + .title-bar + .tab-bar) ---
+  // --- App bar (扁平 IDE 风: <header.appbar> + <nav.tab-bar>) ---
   // active: one of 'index','agents','tasks','dispatches','usage','notifications','settings'
   // pending/findings 推后, appbar 不暴露 (pending.html 文件保留作历史).
   function appBar(active) {
@@ -116,20 +116,15 @@
     }).join('');
     const titleLabel = (tabs.find(t => t[0] === active) || ['', '', ''])[2];
     return `
-      <div class="terminal appbar-frame">
-        <div class="title-bar">
-          <div class="wc">
-            <span class="wb bc"></span>
-            <span class="wb bm"></span>
-            <span class="wb bx"></span>
-          </div>
-          <span class="tt">pre · CEO — ${U.esc(titleLabel || 'home')} — zsh</span>
-          <span id="appbar-token" class="ts">token: -</span>
-          <span id="appbar-health" class="health">master ?</span>
-          <span id="appbar-clock" class="ts"></span>
-        </div>
-        <div class="tab-bar">${tabHtml}</div>
-      </div>`;
+      <header class="appbar">
+        <span class="brand">pre · CEO</span>
+        <span class="ctx" id="appbar-title">${U.esc(titleLabel || 'home')}</span>
+        <span class="grow"></span>
+        <span id="appbar-token" class="ts">token: -</span>
+        <span id="appbar-health" class="health">master ?</span>
+        <span id="appbar-clock" class="ts"></span>
+      </header>
+      <nav class="tab-bar">${tabHtml}</nav>`;
   }
 
   // Show token mask in appbar (must_have #5: 让用户知道用的哪个 token)

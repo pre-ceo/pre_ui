@@ -10,6 +10,7 @@
   grid-template-columns: 130px 280px 1fr;
   gap: 0;
   padding: 0;
+  margin: 0;
   height: 100%;
   align-items: stretch;
   overflow: hidden;
@@ -17,51 +18,44 @@
 }
 
 .node-col   { display: flex; flex-direction: column; min-height: 0; overflow-y: auto;
-              background: var(--bg2); border-right: 1px solid var(--brd);
-              padding: 8px 6px; gap: 4px; }
+              background: var(--bg2);
+              padding: 0; gap: 0;
+              /* 无 border-top: 上方 tab-bar 已有 border-bottom 作分隔. */
+              /* 只占内容高度, 底部留 main bg 透; 列分隔线由 .list-panel border-left 提供 */
+              align-self: start; max-height: 100%; }
 .list-panel { display: flex; flex-direction: column; min-height: 0; overflow: hidden;
-              background: var(--bg2); border-right: 1px solid var(--brd); }
+              background: var(--bg2);
+              border-left: 1px solid var(--brd);
+              border-right: 1px solid var(--brd); }
 .detail-panel { display: flex; flex-direction: column; min-height: 0; overflow: hidden;
                 background: var(--bg); }
 
-/* node-col: 垂直 tab — 终端 ls 列表风, 无 box, 用 prompt arrow 标 active */
+/* node-col: 跟 .agent-row 同款 2 行结构 — 第一行 node 名, 第二行 "N agents".
+   active 用 bg 反白 + 左 2px cyan border (跟 .agent-row.selected 同款), 不用边框做唯一标识. */
 .node-col .node-tab {
-  padding: 3px 8px 3px 14px;
-  font-size: 11px;
-  border: 1px solid transparent;
-  border-radius: 2px;
+  padding: 4px 6px 5px 6px;
+  border-bottom: 1px solid var(--brdl);
+  border-left: 2px solid transparent;
   background: transparent;
-  color: var(--txt2);
   cursor: pointer;
   user-select: none;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  position: relative;
-}
-.node-col .node-tab::before {
-  content: '';
-  position: absolute; left: 4px; top: 50%;
-  transform: translateY(-50%);
-  color: transparent;
+  display: flex; flex-direction: column; gap: 2px;
   font-size: 11px;
 }
-.node-col .node-tab:hover { color: var(--txt); background: var(--bgh); }
-.node-col .node-tab.active {
-  background: var(--bg);
-  color: var(--cyan);
-  border-color: var(--brd);
-  font-weight: 600;
+.node-col .node-tab .name {
+  color: var(--txt);
+  font-weight: 500;
 }
-.node-col .node-tab.active::before { content: '❯'; color: var(--cyan); }
 .node-col .node-tab .count {
-  margin-left: auto;
   color: var(--dim);
   font-size: 10px;
 }
+.node-col .node-tab:hover { background: var(--bgh); }
+.node-col .node-tab.active {
+  background: var(--bg);
+  border-left-color: var(--cyan);
+}
+.node-col .node-tab.active .name { color: var(--cyan); }
 .node-col .node-tab.active .count { color: var(--cyan); }
 
 /* list-panel: filter-bar 顶 + agent-list 自滚 */

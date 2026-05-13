@@ -110,7 +110,10 @@
     // 永远显示 tab (即使单节点) — user 反馈: tab 是 affordance, hide 让用户以为功能不存在
     const tabs = [['all', allAgents.length]].concat(nodes.map(n => [n, counts[n]]));
     tabsEl.innerHTML = tabs.map(([n, ct]) =>
-      `<span class="node-tab ${n === currentNodeFilter ? 'active' : ''}" data-node="${U.esc(n)}">${U.esc(n)}<span class="count">${ct}</span></span>`
+      `<div class="node-tab ${n === currentNodeFilter ? 'active' : ''}" data-node="${U.esc(n)}">
+        <div class="name">${U.esc(n)}</div>
+        <div class="count">${ct} agent${ct === 1 ? '' : 's'}</div>
+      </div>`
     ).join('');
     tabsEl.querySelectorAll('.node-tab').forEach(el => {
       el.addEventListener('click', () => {

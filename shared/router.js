@@ -1,6 +1,6 @@
 // pre_ui SPA hash router.
 //
-// 单壳: index.html 内含 .terminal + .title-bar + .tab-bar 静态壳.
+// 单壳: index.html 内含 <header.appbar> + <nav.tab-bar> + <main#app-content> 扁平 IDE 风静态壳.
 // 每个 js/<page>.js 在加载时注册 window.preApp[key] = { init }, init() 返回 unmount 函数.
 // 路由器负责监听 hashchange, 切换 .tab.active, 调用 unmount/mount.
 //
@@ -33,7 +33,7 @@
       t.classList.toggle('active', t.dataset.route === key);
     });
     const ttl = document.getElementById('appbar-title');
-    if (ttl) ttl.textContent = 'pre · CEO — ' + key + ' — zsh';
+    if (ttl) ttl.textContent = key;
   }
 
   function navigate() {

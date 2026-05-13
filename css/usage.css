@@ -1,7 +1,9 @@
 /* usage — terminal cli prompt 范式, 左对齐 */
 
 .term-page {
+  /* 文本/cli 输出区, 不属于"贴边"容器规则; 保留可读 padding (CLAUDE.md #8 例外) */
   padding: 8px 12px;
+  margin: 0;
   font-size: 12px;
   color: var(--txt);
 }
@@ -24,12 +26,13 @@
   margin: 2px 0 6px 0;
 }
 
-/* node 选择器: .ab 紧凑按钮风, 替代旧 .node-tabs box 样式 */
-#node-tabs {
+/* node 选择器: .ab 紧凑按钮风, 替代旧 .node-tabs box 样式.
+   selector scoped 到 .term-page 内, 避免跟 agents 页的 #node-tabs (.node-col) ID 冲突. */
+.term-page #node-tabs {
   display: flex; gap: 4px; flex-wrap: wrap;
   margin: 4px 0 8px 2ch;
 }
-#node-tabs .node-tab {
+.term-page #node-tabs .node-tab {
   background: none;
   border: 1px solid var(--brd);
   color: var(--txt2);
@@ -40,8 +43,8 @@
   font-size: 10px;
   user-select: none;
 }
-#node-tabs .node-tab:hover { background: var(--bgh); color: var(--txt); }
-#node-tabs .node-tab.active {
+.term-page #node-tabs .node-tab:hover { background: var(--bgh); color: var(--txt); }
+.term-page #node-tabs .node-tab.active {
   color: var(--blue);
   border-color: var(--blue);
 }

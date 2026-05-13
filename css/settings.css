@@ -1,7 +1,9 @@
 /* settings — terminal cli prompt 范式, 左对齐, 无 card 居中 */
 
 .term-page {
+  /* 文本/cli 输出区, 不属于"贴边"容器规则; 保留可读 padding (CLAUDE.md #8 例外) */
   padding: 8px 12px;
+  margin: 0;
   font-size: 12px;
   color: var(--txt);
 }
