@@ -1,131 +1,156 @@
-/* usage.html — LLM cli quota tab () */
+/* usage — terminal cli prompt 范式, 左对齐 */
 
-.usage-wrap {
-  padding: 8px;
-  max-width: 1100px;
-  margin: 0 auto;
+.term-page {
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--txt);
 }
 
-.node-tabs {
-  display: flex; gap: 4px; flex-wrap: wrap;
-  margin: 6px 0 4px 0;
-}
-.node-tabs .node-tab {
-  padding: 4px 12px;
-  border: 1px solid var(--brd);
-  border-radius: 3px;
-  font-size: 11px;
-  color: var(--txt2);
+.term-hints {
   background: var(--bg);
+  border: 1px dashed var(--brdl);
+  border-radius: 3px;
+  padding: 6px 10px;
+  margin: 10px 0 0 0;
+  color: var(--txt2);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+.term-hints .sh { display: block; margin-bottom: 4px; }
+
+.cli-row {
+  display: flex; align-items: center;
+  gap: 6px; flex-wrap: wrap;
+  margin: 2px 0 6px 0;
+}
+
+/* node 选择器: .ab 紧凑按钮风, 替代旧 .node-tabs box 样式 */
+#node-tabs {
+  display: flex; gap: 4px; flex-wrap: wrap;
+  margin: 4px 0 8px 2ch;
+}
+#node-tabs .node-tab {
+  background: none;
+  border: 1px solid var(--brd);
+  color: var(--txt2);
+  padding: 2px 8px;
+  border-radius: 3px;
   cursor: pointer;
+  font-family: inherit;
+  font-size: 10px;
   user-select: none;
 }
-.node-tabs .node-tab:hover { color: var(--txt); border-color: var(--txt2); }
-.node-tabs .node-tab.active {
-  color: var(--cyan);
-  border-color: var(--cyan);
-  background: var(--bg2);
+#node-tabs .node-tab:hover { background: var(--bgh); color: var(--txt); }
+#node-tabs .node-tab.active {
+  color: var(--blue);
+  border-color: var(--blue);
 }
 
-/* stale / fail / no-data banner */
+/* banner (stale / fail / no-data) — terminal 风: 左 magenta/yellow 条 */
 .usage-banner {
-  padding: 6px 10px;
-  border-radius: 4px;
-  margin-bottom: 8px;
+  padding: 4px 10px;
+  margin: 4px 0 6px 2ch;
   font-size: 11px;
-  border-left: 3px solid var(--yellow);
-  background: var(--bg2);
+  border-left: 2px solid var(--yellow);
   color: var(--yellow);
+  background: var(--bg);
 }
 .usage-banner.usage-banner-fail {
   border-left-color: var(--magenta);
   color: var(--magenta);
 }
 
-/* stale row: 整 row dim 化, 但保留可读 */
-.usage-row.usage-row-stale {
-  opacity: 0.65;
-}
-
+/* 一组 provider 输出 — 纯文本流, 无 border 框 */
 .usage-list {
-  display: flex; flex-direction: column;
-  gap: 8px;
-  margin-top: 6px;
+  margin-left: 2ch;
 }
+.urow {
+  margin: 12px 0;
+  padding: 0;
+  color: var(--txt);
+}
+.urow-stale { opacity: 0.65; }
 
-.usage-row {
-  border: 1px solid var(--brd);
-  border-radius: 4px;
-  background: var(--bg2);
-  padding: 10px 12px;
-  display: flex; flex-direction: column; gap: 6px;
-}
-.usage-row .head {
-  display: flex; align-items: center; gap: 10px;
+.urow-head {
+  display: flex; align-items: center; gap: 8px;
   flex-wrap: wrap;
+  margin-bottom: 2px;
 }
-.usage-row .provider {
+.urow .provider {
   color: var(--cyan);
-  font-size: 13px;
-  font-weight: 600;
+  font-weight: bold;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  min-width: 70px;
 }
-.usage-row .meta { display: flex; gap: 14px; flex-wrap: wrap; font-size: 11px; }
-.usage-row .meta .k { color: var(--dim); margin-right: 4px; }
-.usage-row .meta .v { color: var(--txt); }
-.usage-row .meta .v.warn { color: var(--yellow); }
-.usage-row .meta .v.crit { color: var(--magenta); }
+.urow .status-tag { font-size: 11px; }
+.urow .status-tag.s { color: var(--cyan); }
+.urow .status-tag.w { color: var(--yellow); }
+.urow .status-tag.e { color: var(--magenta); }
+.urow .status-tag.b { color: var(--blue); }
+.urow .status-tag.m { color: var(--dim); }
+.urow .stale-tag { color: var(--yellow); font-size: 11px; }
 
-/* 进度条 */
-.usage-bar {
-  display: flex; align-items: center; gap: 8px;
+.urow-body {
+  padding-left: 2ch;
+  white-space: pre;
+  line-height: 1.5;
+}
+
+/* ascii 进度条行: monospace pre-fmt 用 inline span 保对齐 */
+.ubar {
+  display: block;
+  font-family: inherit;
+  white-space: pre;
+}
+.ubar .ubar-label {
+  display: inline-block;
+  min-width: 11ch;
+  color: var(--dim);
+}
+.ubar .ubar-track       { color: var(--cyan); }
+.ubar .ubar-track.w     { color: var(--yellow); }
+.ubar .ubar-track.e     { color: var(--magenta); }
+.ubar .ubar-pct         { display: inline-block; min-width: 5ch; text-align: right; color: var(--cyan); }
+.ubar .ubar-pct.w       { color: var(--yellow); }
+.ubar .ubar-pct.e       { color: var(--magenta); }
+.ubar .ubar-reset       { color: var(--dim); margin-left: 1ch; }
+
+.urow .meta {
+  display: block;
+  padding-left: 11ch;
+  color: var(--txt2);
   font-size: 11px;
+  margin-top: 2px;
 }
-.usage-bar .label { color: var(--dim); min-width: 60px; }
-.usage-bar .pct { color: var(--txt); min-width: 38px; text-align: right; }
-.usage-bar .reset { color: var(--dim); font-size: 10px; }
-.usage-bar .track {
-  flex: 1;
-  height: 6px;
-  background: var(--bg);
-  border: 1px solid var(--brd);
-  border-radius: 3px;
-  overflow: hidden;
-}
-.usage-bar .fill {
-  height: 100%;
-  background: var(--cyan);
-  transition: width 0.2s;
-}
-.usage-bar .fill.warn { background: var(--yellow); }
-.usage-bar .fill.crit { background: var(--magenta); }
+.urow .meta .k { color: var(--dim); margin-right: 4px; }
+.urow .meta .v { color: var(--txt); margin-right: 10px; }
+.urow .meta .v.warn { color: var(--yellow); }
+.urow .meta .v.crit { color: var(--magenta); }
 
-/* raw 折叠区 */
-.usage-raw-toggle {
+/* raw_excerpt 折叠区 */
+.urow-raw-toggle {
+  cursor: pointer;
+  user-select: none;
   font-size: 10px;
   color: var(--dim);
-  cursor: pointer;
-  padding: 2px 0;
-  user-select: none;
+  padding-left: 2ch;
+  margin-top: 4px;
 }
-.usage-raw-toggle:hover { color: var(--blue); }
-
-.usage-raw {
+.urow-raw-toggle:hover { color: var(--blue); }
+.urow-raw {
   display: none;
+  margin: 2px 0 0 2ch;
   background: var(--bg);
-  border: 1px solid var(--brd);
+  border: 1px dashed var(--brdl);
   border-radius: 3px;
   padding: 6px 8px;
   font-size: 10px;
   color: var(--txt2);
   white-space: pre-wrap;
   word-break: break-word;
-  margin: 0;
 }
-.usage-row.expanded .usage-raw { display: block; }
-.usage-row.expanded .usage-raw-toggle::before { content: "▼ "; }
-.usage-row:not(.expanded) .usage-raw-toggle::before { content: "▶ "; }
+.urow.expanded .urow-raw { display: block; }
+.urow.expanded .urow-raw-toggle::before { content: "▼ "; }
+.urow:not(.expanded) .urow-raw-toggle::before { content: "▶ "; }
 
 .p-12 { padding: 12px; }

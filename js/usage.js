@@ -6,18 +6,19 @@
   const U = window.preUtils, A = window.preApi, C = window.preCmp;
 
   const TEMPLATE = `
-    <div class="usage-wrap">
-      <div class="card">
-        <h2>LLM cli usage <span id="probed-ts" class="dim" style="font-weight:normal;font-size:11px;">probed: -</span></h2>
-        <div id="node-tabs" class="node-tabs"></div>
-        <div id="usage-list" class="usage-list">
-          <div class="dim p-12">loading...</div>
-        </div>
-        <div class="dim" style="font-size:10px;margin-top:10px;">
-          master 每 10min 周期抓一次 (cli 内置 /usage|/quota|/status 命令, 0 LLM token 消耗).
-          点击 raw 行展开看完整原始输出 (含 ANSI / box drawing).
-        </div>
+    <div class="term-page">
+      <div class="cli-row">
+        <span class="pa">❯</span><span class="pt">pre usage</span><span class="m">--node=</span><span class="b" id="usage-node-label">local</span>
+        <span class="grow"></span>
+        <span class="m" id="probed-ts" style="font-size:11px;">probed: -</span>
       </div>
+      <div id="node-tabs"></div>
+      <div id="usage-list" class="usage-list">
+        <div class="dim p-12">loading...</div>
+      </div>
+      <pre class="term-hints"><span class="sh"># hints</span>
+  <span class="m">·</span> master 每 10min 周期抓 (cli 内置 /usage|/quota|/status, 0 LLM token 消耗)
+  <span class="m">·</span> 点击 <span class="m">raw_excerpt</span> 行展开看完整 cli 输出 (含 ANSI / box drawing)</pre>
     </div>`;
 
   function init(host) {
@@ -34,18 +35,18 @@
     let lastSuccessByNode = {};   // { nodeId: nodeData }
     let lastTopLevel = null;       // 全 page 级 stale 信息 (age_sec / stale)
 
-  function statusPill(status) {
+  // 状态文本 [ok] / [near_limit] / ... — terminal 风, 不用 pill 背景
+  function statusTag(status) {
     const s = (status || 'unknown').toLowerCase();
-    // gemini parser 加新值: unknown / probe_inconclusive / status_bar_only / ok / limit_reached
-    const COLOR = {
-      'ok': 'cyan',
-      'near_limit': 'yellow',
-      'limit_reached': 'magenta',
-      'error': 'magenta',
-      'timeout': 'yellow',
-      'unknown': 'dim',
-      'probe_inconclusive': 'blue',
-      'status_bar_only': 'yellow',
+    const CLS = {
+      'ok': 's',
+      'near_limit': 'w',
+      'limit_reached': 'e',
+      'error': 'e',
+      'timeout': 'w',
+      'unknown': 'm',
+      'probe_inconclusive': 'b',
+      'status_bar_only': 'w',
     };
     const TIPS = {
       'ok': '配额正常',
@@ -53,27 +54,25 @@
       'limit_reached': '配额耗尽, 已切 fallback model',
       'unknown': '探测未完成或无数据',
       'probe_inconclusive': '探测命令未输出可解析的配额数据',
-      'status_bar_only': '仅看到 cli status bar (active model + 简短 %), 未获完整 quota 详情',
+      'status_bar_only': '仅看到 cli status bar, 未获完整 quota 详情',
       'error': '探测出错',
       'timeout': '探测超时',
     };
-    const cls = COLOR[s] || 'dim';
-    const tip = TIPS[s] || s;
-    return `<span class="pill ${cls}" title="${U.esc(tip)}">${U.esc(s)}</span>`;
+    const cls = CLS[s] || 'm';
+    return `<span class="status-tag ${cls}" title="${U.esc(TIPS[s] || s)}">[${U.esc(s)}]</span>`;
   }
 
-  // 进度条 (left=可用百分比, used=已用百分比). codex 给的是 'percent_left'.
+  // ascii 进度条 (terminal 风): █ filled, ░ empty, 20 ch wide.
   function progressBar(label, used, reset) {
     if (used == null) return '';
-    const pct = Math.max(0, Math.min(100, Number(used)));
-    const cls = pct >= 90 ? 'crit' : (pct >= 70 ? 'warn' : '');
-    const resetHtml = reset ? `<span class="reset">resets ${U.esc(String(reset))}</span>` : '';
-    return `<div class="usage-bar">
-      <span class="label">${U.esc(label)}</span>
-      <div class="track"><div class="fill ${cls}" style="width:${pct}%"></div></div>
-      <span class="pct ${cls === 'crit' ? 'crit' : (cls === 'warn' ? 'warn' : '')}">${pct}% used</span>
-      ${resetHtml}
-    </div>`;
+    const pct = Math.max(0, Math.min(100, Math.round(Number(used))));
+    const cls = pct >= 90 ? 'e' : (pct >= 70 ? 'w' : '');
+    const w = 20;
+    const filled = Math.round((pct / 100) * w);
+    const bar = '█'.repeat(filled) + '░'.repeat(w - filled);
+    const pctStr = String(pct).padStart(3) + '%';
+    const resetHtml = reset ? `<span class="ubar-reset">resets ${U.esc(String(reset))}</span>` : '';
+    return `<span class="ubar"><span class="ubar-label">${U.esc(label)}</span><span class="ubar-track ${cls}">${bar}</span> <span class="ubar-pct ${cls}">${U.esc(pctStr)}</span>${resetHtml}</span>`;
   }
 
   // 解析 claude raw_excerpt 抽 session/week %
@@ -183,18 +182,17 @@
     const raw = d.raw_excerpt || '';
     const stale = isStale(d);
     const staleTag = stale
-      ? `<span class="pill yellow" title="该 provider age=${U.esc(ageLabel(d))}, 超过 30min 视为 stale">stale ${U.esc(ageLabel(d))}</span>`
+      ? `<span class="stale-tag" title="该 provider age=${U.esc(ageLabel(d))}, 超过 30min 视为 stale">[stale ${U.esc(ageLabel(d))}]</span>`
       : '';
     return `
-      <div class="usage-row ${stale ? 'usage-row-stale' : ''}" data-provider="${U.esc(provider)}">
-        <div class="head">
+      <div class="urow ${stale ? 'urow-stale' : ''}" data-provider="${U.esc(provider)}">
+        <div class="urow-head">
           <span class="provider">${U.esc(provider)}</span>
-          ${statusPill(d.status)}
+          ${statusTag(d.status)}
           ${staleTag}
-          <span class="grow"></span>
         </div>
-        ${body}
-        ${raw ? `<div class="usage-raw-toggle">raw_excerpt (${raw.length} 字)</div><pre class="usage-raw">${U.esc(raw)}</pre>` : ''}
+        <div class="urow-body">${body}</div>
+        ${raw ? `<div class="urow-raw-toggle">raw_excerpt (${raw.length} 字)</div><pre class="urow-raw">${U.esc(raw)}</pre>` : ''}
       </div>`;
   }
 
@@ -229,9 +227,9 @@
     }
 
     list.innerHTML = bannerHtml + present.map(p => rowHTML(p, data[p])).join('');
-    list.querySelectorAll('.usage-raw-toggle').forEach(t => {
+    list.querySelectorAll('.urow-raw-toggle').forEach(t => {
       t.addEventListener('click', () => {
-        t.closest('.usage-row').classList.toggle('expanded');
+        t.closest('.urow').classList.toggle('expanded');
       });
     });
     if (data.probed_ts) {
@@ -241,9 +239,8 @@
   }
 
   function renderNodeTabs() {
-    // 永远显示 tab (即使单节点)
     nodeTabsEl.innerHTML = knownNodes.map(n =>
-      `<span class="node-tab ${n === currentNode ? 'active' : ''}" data-node="${U.esc(n)}">${U.esc(n)}</span>`
+      `<button class="node-tab ${n === currentNode ? 'active' : ''}" data-node="${U.esc(n)}">${U.esc(n)}</button>`
     ).join('');
     nodeTabsEl.querySelectorAll('.node-tab').forEach(el => {
       el.addEventListener('click', () => {
@@ -251,10 +248,14 @@
         if (n === currentNode) return;
         currentNode = n;
         U.ssSet('usage_node', n);
+        const lbl = document.getElementById('usage-node-label');
+        if (lbl) lbl.textContent = n;
         renderNodeTabs();
         refresh();
       });
     });
+    const lbl = document.getElementById('usage-node-label');
+    if (lbl) lbl.textContent = currentNode;
   }
 
   function hasData(d) {

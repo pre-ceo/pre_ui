@@ -11,18 +11,19 @@
 <body>
 <div id="appbar-host"></div>
 
-<div class="usage-wrap">
-  <div class="card">
-    <h2>LLM cli usage <span id="probed-ts" class="dim" style="font-weight:normal;font-size:11px;">probed: -</span></h2>
-    <div id="node-tabs" class="node-tabs"></div>
-    <div id="usage-list" class="usage-list">
-      <div class="dim p-12">loading...</div>
-    </div>
-    <div class="dim" style="font-size:10px;margin-top:10px;">
-      master 每 10min 周期抓一次 (cli 内置 /usage|/quota|/status 命令, 0 LLM token 消耗).
-      点击 raw 行展开看完整原始输出 (含 ANSI / box drawing).
-    </div>
+<div class="term-page">
+  <div class="cli-row">
+    <span class="pa">❯</span><span class="pt">pre usage</span><span class="m">--node=</span><span class="b" id="usage-node-label">local</span>
+    <span class="grow"></span>
+    <span class="m" id="probed-ts" style="font-size:11px;">probed: -</span>
   </div>
+  <div id="node-tabs"></div>
+  <div id="usage-list" class="usage-list">
+    <div class="dim p-12">loading...</div>
+  </div>
+  <pre class="term-hints"><span class="sh"># hints</span>
+  <span class="m">·</span> master 每 10min 周期抓 (cli 内置 /usage|/quota|/status, 0 LLM token 消耗)
+  <span class="m">·</span> 点击 <span class="m">raw_excerpt</span> 行展开看完整 cli 输出 (含 ANSI / box drawing)</pre>
 </div>
 
 <script src="shared/vendor/dompurify.min.js"

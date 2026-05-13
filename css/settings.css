@@ -1,53 +1,60 @@
-/* settings.html page-specific */
+/* settings — terminal cli prompt 范式, 左对齐, 无 card 居中 */
 
-.settings-wrap {
-  max-width: 640px;
-  margin: 16px auto;
-  padding: 0 12px;
+.term-page {
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--txt);
 }
 
-.token-form {
-  display: grid;
-  grid-template-columns: 100px 1fr;
-  gap: 8px 12px;
+.term-block,
+.term-result,
+.term-hints {
+  background: var(--bg);
+  border: 1px dashed var(--brdl);
+  border-radius: 3px;
+  padding: 6px 10px;
+  margin: 6px 0;
+  color: var(--txt2);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.term-block .sh,
+.term-hints .sh {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.cli-row {
+  display: flex;
   align-items: center;
-  font-size: 11px;
+  gap: 6px;
+  margin: 10px 0 4px 0;
+  flex-wrap: wrap;
 }
-.token-form label { color: var(--dim); }
-.token-form .row {
-  display: flex; gap: 6px; align-items: center;
+.cli-row .if {
+  margin: 4px 0 0 2ch;
+  flex: 1 1 320px;
 }
-.token-form input[type=password],
-.token-form input[type=text] {
-  flex: 1; min-width: 0;
+.cli-row .if input[type=password],
+.cli-row .if input[type=text] {
+  flex: 1;
+  min-width: 200px;
 }
-.token-form .mask {
-  font-family: inherit; color: var(--cyan);
+
+.token-mask {
+  color: var(--cyan);
   letter-spacing: 0.05em;
 }
 
-.btn-row {
-  display: flex; gap: 6px; margin-top: 8px;
-  grid-column: 1 / -1;
+.term-result {
+  min-height: 22px;
+  margin-left: 2ch;
 }
+.term-result.s { color: var(--cyan); border-color: var(--cyan); border-style: solid; }
+.term-result.e { color: var(--magenta); border-color: var(--magenta); border-style: solid; }
+.term-result.m { color: var(--dim); }
 
-.status-line {
-  margin-top: 12px;
-  padding: 8px 10px;
-  background: var(--bg2);
-  border: 1px solid var(--brd);
-  border-radius: 3px;
-  font-size: 11px;
-  min-height: 28px;
-}
-
+.ebox.hidden,
 .banner.hidden { display: none; }
-
-.tip {
-  margin-top: 14px; padding: 10px;
-  background: var(--bg2);
-  border-left: 2px solid var(--blue);
-  font-size: 11px; color: var(--txt2);
-  line-height: 1.7;
-}
-.tip code { background: var(--bg3); color: var(--cyan); padding: 1px 4px; border-radius: 2px; }

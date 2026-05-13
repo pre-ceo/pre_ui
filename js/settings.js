@@ -7,50 +7,38 @@
   const U = window.preUtils, A = window.preApi, C = window.preCmp;
 
   const TEMPLATE = `
-    <div class="settings-wrap">
-      <div id="reason-banner" class="banner err hidden"></div>
+    <div class="term-page">
+      <div id="reason-banner" class="ebox hidden" style="margin:0 0 8px 0;"></div>
 
-      <div class="card">
-        <h2>Bearer token</h2>
+      <pre class="term-block"><span class="sh"># bearer token</span>  <span class="m">current:</span> <span class="token-mask" id="token-mask">-</span>     <span class="m">(localStorage · 跨重启保留)</span>
+  <span class="m">storage:</span> <span class="m">localStorage["pre_master_token"]</span></pre>
 
-        <div class="token-form">
-          <label>当前 token</label>
-          <div class="row">
-            <span class="mask" id="token-mask">-</span>
-            <span class="grow"></span>
-            <span class="dim" style="font-size:10px;">存于 localStorage · 跨重启保留 (clear 手动清)</span>
-          </div>
-
-          <label for="token-input">新 token</label>
-          <div class="row">
-            <input id="token-input"
-                   type="password"
-                   name="master_token"
-                   autocomplete="off"
-                   spellcheck="false"
-                   placeholder="Bearer token (magic link 自动注入, 或从 ~/.pre/env 复制)">
-            <button class="btn" id="show-btn" type="button" title="按住显示明文">show</button>
-          </div>
-
-          <div class="btn-row">
-            <button class="btn primary" id="save-btn" type="button">save token</button>
-            <button class="btn warn" id="clear-btn" type="button">clear token</button>
-            <span class="grow"></span>
-            <button class="btn" id="ping-btn" type="button">ping /healthz</button>
-          </div>
-        </div>
-
-        <div class="status-line" id="status">尚未 ping</div>
-
-        <div class="tip">
-          · self-proxy 模式: 浏览器同 origin 5174 → 内部反代到 master 19500<br>
-          · master URL 在 server 端 (<code>scripts/fe_server.py --master ...</code>), 浏览器侧不可改<br>
-          · type=password + autocomplete=off, 截屏不泄露<br>
-          · localStorage (CLAUDE.md #5, single-user 本机): token 持久化, 跨重启免重输; clear 手动清<br>
-          · ping 走 <code>./healthz</code> 相对路径, 由 5174 反代到 master<br>
-          · 401 跳设置页时, 顶部 banner 提示原因
+      <div class="cli-row">
+        <span class="pa">❯</span><span class="pt">pre token</span><span class="m">set</span>
+        <div class="if">
+          <input id="token-input"
+                 type="password"
+                 name="master_token"
+                 autocomplete="off"
+                 spellcheck="false"
+                 placeholder="Bearer token (magic link 自动注入, 或从 ~/.pre/env 复制)">
+          <button class="ab" id="show-btn" type="button" title="按住显示明文">show</button>
+          <button class="ab p" id="save-btn" type="button">save</button>
+          <button class="ab" id="clear-btn" type="button">clear</button>
         </div>
       </div>
+
+      <div class="cli-row">
+        <span class="pa">❯</span><span class="pt">pre healthz</span>
+        <button class="ab" id="ping-btn" type="button" style="margin-left:8px;">ping</button>
+      </div>
+      <pre class="term-result m" id="status">尚未 ping</pre>
+
+      <pre class="term-hints"><span class="sh"># hints</span>
+  <span class="m">·</span> self-proxy: browser <span class="c">5174</span> → master <span class="c">19500</span>
+  <span class="m">·</span> localStorage 跨重启保留, clear 手动清; type=password + autocomplete=off (截屏安全)
+  <span class="m">·</span> magic-link: pre 端 start_master.py 颁发激活 URL, fragment 走 localStorage
+  <span class="m">·</span> 401 时, 顶部 ebox 显示跳转原因</pre>
     </div>`;
 
   function init(host) {
@@ -67,7 +55,7 @@
     const reasonBanner = $('reason-banner');
 
     if (U.getParam('reason') === '401') {
-      reasonBanner.textContent = '由于 401 Unauthorized 跳转, 请检查 Bearer token 是否正确';
+      reasonBanner.textContent = '! 401 Unauthorized — 检查 Bearer token 是否正确';
       reasonBanner.classList.remove('hidden');
     }
 
@@ -97,16 +85,16 @@
     const onPing = async () => {
       pingBtn.disabled = true;
       status.textContent = 'pinging...';
-      status.className = 'dim';
+      status.className = 'term-result m';
       try {
         const txt = await A.healthz();
         status.textContent = typeof txt === 'string' ? txt.trim() : JSON.stringify(txt);
-        status.className = 'c-cyan';
+        status.className = 'term-result s';
       } catch (e) {
         status.textContent = e.kind === 'http'
           ? `HTTP ${e.status}: ${typeof e.body === 'string' ? e.body : JSON.stringify(e.body || {})}`
           : `network: ${e.message || 'unknown'}`;
-        status.className = 'c-magenta';
+        status.className = 'term-result e';
       } finally {
         pingBtn.disabled = false;
       }
