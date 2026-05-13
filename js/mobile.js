@@ -1,4 +1,4 @@
-// pre_ui mobile — iOS 单页快速 decide
+// pre_ui mobile — 移动端单页快速 decide
 // 仅显示 activity.state === 'blocked_user' 的 agent, 4 大按钮直接 POST /decide.
 // 5s 轮询, 已批准的自动从列表消失.
 (function () {

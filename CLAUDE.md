@@ -7,9 +7,13 @@ master 当 CEO 操控台. 在这个仓库工作时遵循以下硬约束.
 
 1. **零框架**: 纯 HTML + CSS + vanilla JS, 不引入 React/Vue/Svelte/任何打包器.
 2. **配色**: cyan / yellow / blue / magenta + 中性灰. **严禁红绿** (用户红绿色弱).
-   设计语言对齐 [`fn_fe`](../fn_fe) curve 终端范式: macOS Terminal **light** 主题 (白底 #fff +
-   深灰 #333), monospace (Menlo/Monaco), 12px base. fn_fe 用红绿表 ok/err, pre_ui 重映射为
-   cyan/magenta — 见 `shared/theme.css` `--ok=cyan / --err=magenta / .s/.e/.td-ok/.td-err`.
+   设计语言对齐 [`fn_fe`](../fn_fe) curve 终端范式: 白底 light 主题 (#fff + 深灰 #333),
+   通用 monospace (ui-monospace + 开源字体链, 见 `theme.css` body), 12px base.
+   **不复刻任何特定平台 (e.g. macOS Terminal) 的字体 / 配色 / trade dress** — 字体严禁
+   引用 Menlo / Monaco / SF Mono / Courier New 等专有名称; 窗口 chrome 圆点尺寸缩到 10px
+   + 配色已脱钩任一平台 trade dress. fn_fe 用红绿表 ok/err, pre_ui 重映射为 cyan/magenta
+   — 见 `shared/theme.css` `--ok=cyan / --err=magenta / .s/.e/.td-ok/.td-err`. 合规说明见
+   `docs/OPENSOURCE_DESIGN_COMPLIANCE.md`.
 3. **DOMPurify 3.2.4 vendored + SRI**: 任何 markdown 渲染必须经 DOMPurify, 整体 hash 校验.
 4. **严格 CSP**: `default-src 'self'; connect-src 'self' http://127.0.0.1:19500;`. 禁 inline `<script>`/`<style>`.
 5. **Bearer token**: localStorage (key `pre_master_token`) + `type="password"` + autocomplete=off + 掩码显示.
@@ -65,7 +69,7 @@ docs/               ← 需求/设计/API 镜像
 - `#pending` 不在 tab-bar (Phase B 推后), 仅 hash 直链可达.
 - 每个 `js/<page>.js` 注册 `window.preApp[key] = { init }`. `init(host)` 把 TEMPLATE
   注入 host, 绑定 handler, 起 polling, 返回 `unmount` 函数 (stop poll + 解绑 document/window listener).
-- `mobile.html` / `js/mobile.js` 不入 SPA — iOS 单页快速 decide UI, 独立路由.
+- `mobile.html` / `js/mobile.js` 不入 SPA — 移动端单页快速 decide UI, 独立路由.
 - 老 `<page>.html` 入口仍可独立访问 (deep-link 迁移期); 各 page JS 通过
   `if (!document.getElementById('app-content')) { ... C.appBar(key); init(); }` fallback 保留行为.
 - 写新 tab: (1) 加 `js/<page>.js` 走 init/unmount + preApp 注册套路, (2) 在 `index.html`
@@ -78,7 +82,7 @@ theme.css 暴露一组终端范式组件, 写新页面优先复用:
 
 | 类 | 用途 |
 |----|------|
-| `.terminal` | macOS 窗口外壳 (圆角 + 投影 + title-bar) — appbar 已用 |
+| `.terminal` | 终端窗口外壳 (圆角 + 投影 + title-bar, 通用 cli chrome) — appbar 已用 |
 | `.title-bar` + `.wc/.wb`/`.tt`/`.ts` | 标题栏 (流量灯灰化 / 居中标题 / 时钟) |
 | `.tab-bar` + `.tab` (`.active`) | 顶部 tab, 替代旧 `.appbar .nav` |
 | `.td` (`-ok` cyan / `-err` magenta / `-w` yellow / `-unk` 灰) | 6px 状态点 |

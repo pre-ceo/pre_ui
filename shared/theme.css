@@ -1,5 +1,7 @@
-/* pre_ui shared theme — fn_fe-aligned macOS Terminal LIGHT, cyan/yellow/blue/magenta only.
-   user 红绿色弱: 严禁 red/green 字面色, 只用 cyan/yellow/blue/magenta + 中性灰. */
+/* pre_ui shared theme — fn_fe-aligned terminal LIGHT, cyan/yellow/blue/magenta only.
+   user 红绿色弱: 严禁 red/green 字面色, 只用 cyan/yellow/blue/magenta + 中性灰.
+   开源合规: 字体走开源 monospace 链 + ui-monospace 关键字, 不引用任何专有字体名;
+   "terminal" 指通用 cli prompt 范式, 不刻意复刻任何特定平台 (e.g. macOS Terminal). */
 
 :root {
   /* === fn_fe curve light surface tokens === */
@@ -59,7 +61,13 @@
 html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
 
 body {
-  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  /* 开源字体链: ui-monospace = OS 默认 monospace (CSS Fonts L4 关键字),
+     后接 SIL OFL / Apache / 公有领域字体, 末尾 generic monospace 兜底.
+     严格不引用 Menlo / Monaco / SF Mono / Courier New 等专有字体名, 避免任何潜在
+     版权 / trade dress 风险 (Apple SF 字体族限苹果生态内使用; Courier 系列闭源). */
+  font-family: ui-monospace, 'Cascadia Mono', 'Source Code Pro',
+               'JetBrains Mono', 'DejaVu Sans Mono', 'Liberation Mono',
+               Consolas, monospace;
   background: var(--bg);
   color: var(--txt);
   font-size: 12px;
@@ -88,7 +96,7 @@ pre {
 hr { border: 0; border-top: 1px solid var(--brdl); margin: 8px 0; }
 
 /* ============================================================
-   macOS terminal window chrome (fn_fe curve 范式)
+   Terminal window chrome (通用 cli/window pattern, 不复刻任何特定平台)
    ============================================================ */
 .terminal {
   border: 1px solid var(--brd);
@@ -117,12 +125,15 @@ hr { border: 0; border-top: 1px solid var(--brdl); margin: 8px 0; }
   gap: 8px;
   user-select: none;
 }
-.wc { display: flex; gap: 6px; }
+.wc { display: flex; gap: 5px; }
+/* 装饰指示点: 通用 window/cli 范式 (横排 N 个小圆点是常见 chrome 元素, 非任何
+   特定平台独占). 尺寸 10px (而非常见 12-13px), 配色统一中性灰, 完全脱钩任何
+   平台的 trade dress (e.g. Apple 的红黄绿流量灯). 严禁红绿 (用户红绿色弱) +
+   严禁复刻苹果 #ff5f57/#ffbd2e/#28c940 配色. */
 .wb {
-  width: 12px; height: 12px; border-radius: 50%;
+  width: 10px; height: 10px; border-radius: 50%;
   border: 1px solid rgba(0,0,0,.15);
 }
-/* 严禁红绿 (M2): 装饰圆点也保留中性灰, 不复刻 fn_fe 的 #ff5f57/#ffbd2e/#28c940. */
 .bc, .bm, .bx { background: var(--dim); }
 .tt {
   flex: 1; text-align: center; color: var(--txt2);

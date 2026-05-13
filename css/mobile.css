@@ -1,14 +1,14 @@
-/* pre_ui mobile — iOS 单页快速 decide
-   设计: 大触按钮 (≥ 44px tap target per Apple HIG), 单列, 暗色, 防误触 */
+/* pre_ui mobile — 移动端单页快速 decide
+   设计: 大触按钮 (≥ 44px touch target, mobile UX baseline), 单列, 暗色, 防误触 */
 
 * { box-sizing: border-box; }
 html, body {
   margin: 0; padding: 0;
-  /* iOS Safari 底部 toolbar 高度 + safe-area */
+  /* 移动浏览器底部 toolbar 高度 + safe-area (env() 是 W3C CSS 标准) */
   padding-bottom: env(safe-area-inset-bottom);
   background: var(--bg);
   color: var(--txt);
-  font-size: 15px;          /* base 比 desktop (12) 大, iOS 易读 */
+  font-size: 15px;          /* base 比 desktop (12) 大, 移动端易读 */
   line-height: 1.4;
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
@@ -100,7 +100,7 @@ html, body {
   color: var(--txt2);
   white-space: pre-wrap; word-break: break-word;
   margin: 0;
-  /* 不内部滚动 — 跟随文本完全展开, 整个页面由 iOS Safari 滚动 */
+  /* 不内部滚动 — 跟随文本完全展开, 整个页面由移动浏览器滚动 */
 }
 .m-section-label {
   color: var(--dim);
@@ -141,7 +141,7 @@ html, body {
   border: 1px solid var(--brdl);
 }
 
-/* ---- decide 按钮: 4 个一行, 紧凑高度 ≥ 44px (Apple HIG min) ---- */
+/* ---- decide 按钮: 4 个一行, 紧凑高度 ≥ 44px (mobile UX baseline) ---- */
 .m-actions {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;   /* 4 等分一行 */
@@ -166,7 +166,7 @@ html, body {
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  min-height: 44px;          /* Apple HIG min, 同时 4 列也不挤 */
+  min-height: 44px;          /* 44px touch target (mobile UX baseline), 同时 4 列也不挤 */
   transition: transform 0.05s, background 0.1s;
   text-align: center;
   line-height: 1.1;
