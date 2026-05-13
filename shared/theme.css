@@ -1,0 +1,563 @@
+/* pre_ui shared theme — fn_fe-aligned macOS Terminal LIGHT, cyan/yellow/blue/magenta only.
+   user 红绿色弱: 严禁 red/green 字面色, 只用 cyan/yellow/blue/magenta + 中性灰. */
+
+:root {
+  /* === fn_fe curve light surface tokens === */
+  --bg:   #ffffff;   /* terminal body / canvas */
+  --bg2:  #f5f5f5;   /* card / nav / table-stripe */
+  --bgh:  #ebebeb;   /* hover */
+  --bg3:  #dcdcdc;   /* selected */
+
+  --txt:  #333333;   /* body text */
+  --txt2: #666666;   /* secondary text */
+  --dim:  #999999;   /* muted / metadata */
+  --brd:  #d0d0d0;   /* primary border */
+  --brdl: #e6e6e6;   /* light divider */
+
+  /* === Accent palette (无红无绿; fn_fe curve 的取值在白底足够对比) === */
+  --cyan:    #00a3a5;
+  --yellow:  #a68f00;   /* olive-yellow, 亮黄 #c7c400 在白底太淡 */
+  --blue:    #0225c7;
+  --magenta: #c930c7;
+
+  /* fn_fe 用 ok/err/warn/info 语义色; pre_ui 严禁红绿 → 全部映射到 cyan/magenta/yellow/blue */
+  --ok:   var(--cyan);
+  --err:  var(--magenta);
+  --warn: var(--yellow);
+  --info: var(--blue);
+
+  /* === 状态映射 (按 CEO 关注度而非状态分类)
+     idle=cyan(平静) / busy=yellow(在干活, 轻提示) / blocked_user=magenta(等你批准)
+     thinking=yellow(同 busy) / error=magenta(异常) / offline=dim
+     idle_with_proposals=yellow (等用户选下一步, 比 blocked_user 优先级低) */
+  --st-idle:                 var(--cyan);
+  --st-busy:                 var(--yellow);
+  --st-thinking:             var(--yellow);
+  --st-blocked-user:         var(--magenta);
+  --st-blocked:              var(--magenta);
+  --st-idle-with-proposals:  var(--yellow);
+  --st-error:                var(--magenta);
+  --st-offline:              var(--dim);
+  /* 历史出现过但 driver 不再 yield (用户语义: "未接管") — 灰 */
+  --st-stale:                var(--dim);
+  /* 配置坏: tmux 缺/hook 没装/cwd 没了 — magenta 警示 (严禁红) */
+  --st-failed:               var(--magenta);
+
+  /* === 角色映射 === */
+  --role-ceo:     var(--magenta);
+  --role-worker:  var(--cyan);
+  --role-freerun: var(--yellow);
+  --role-observer:var(--dim);
+
+  /* === finding 严重度 === */
+  --sev-info:     var(--blue);
+  --sev-warning:  var(--yellow);
+  --sev-critical: var(--magenta);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+
+body {
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  background: var(--bg);
+  color: var(--txt);
+  font-size: 12px;
+  line-height: 1.4;
+  display: flex;
+  flex-direction: column;
+}
+
+a { color: var(--blue); text-decoration: none; }
+a:hover { color: var(--cyan); text-decoration: underline; }
+
+code, pre {
+  font-family: inherit;
+  background: var(--bg2);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+pre {
+  padding: 8px 10px;
+  overflow-x: auto;
+  white-space: pre;
+  border: 1px solid var(--brd);
+  margin: 0;
+}
+
+hr { border: 0; border-top: 1px solid var(--brdl); margin: 8px 0; }
+
+/* ============================================================
+   macOS terminal window chrome (fn_fe curve 范式)
+   ============================================================ */
+.terminal {
+  border: 1px solid var(--brd);
+  border-radius: 6px;
+  margin: 8px;
+  overflow: hidden;
+  background: var(--bg);
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+/* SPA 顶层 .terminal#appbar-frame: 撑满 viewport, title-bar / tab-bar 固定, body 区滚 */
+.terminal#appbar-frame {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.terminal#appbar-frame > .title-bar,
+.terminal#appbar-frame > .tab-bar { flex-shrink: 0; }
+
+.title-bar {
+  background: linear-gradient(180deg, #e8e8e8, #d1d1d1);
+  border-bottom: 1px solid var(--brd);
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+}
+.wc { display: flex; gap: 6px; }
+.wb {
+  width: 12px; height: 12px; border-radius: 50%;
+  border: 1px solid rgba(0,0,0,.15);
+}
+/* 严禁红绿 (M2): 装饰圆点也保留中性灰, 不复刻 fn_fe 的 #ff5f57/#ffbd2e/#28c940. */
+.bc, .bm, .bx { background: var(--dim); }
+.tt {
+  flex: 1; text-align: center; color: var(--txt2);
+  font-size: 12px; font-weight: 500;
+}
+.ts { color: var(--dim); font-size: 10px; }
+
+/* === Tab bar (fn_fe curve 顶部 tab 范式) === */
+.tab-bar {
+  display: flex;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--brd);
+  padding: 0 8px;
+  flex-wrap: wrap;
+}
+
+/* === Terminal body: SPA #app-content, 撑满剩余空间, 默认页面级 overflow-y:auto. ===
+   agents tab 自己拿 100% 高度并把内部 list/chat 各自做 scroll → 见 css/agents.css.
+   其他 tab (home/tasks/notifications/...) 内容自然流, 由这层 #app-content 滚, body 不滚. */
+.terminal-body {
+  background: var(--bg);
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+/* 内容里的 .card / .agents-layout / .tasks-wrap 等都自带 margin/padding,
+   .terminal-body 自己不再加 padding, 否则会跟它们 double-pad 显出二重边框感 */
+.tab {
+  padding: 6px 16px;
+  cursor: pointer;
+  color: var(--dim);
+  font-size: 11px;
+  font-weight: 500;
+  border-bottom: 2px solid transparent;
+  transition: color .15s, background .15s, border-color .15s;
+  user-select: none;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+.tab:hover { color: var(--txt); background: var(--bgh); text-decoration: none; }
+.tab.active {
+  color: var(--blue);
+  border-bottom-color: var(--blue);
+  background: var(--bg);
+}
+
+/* === 状态点 (fn_fe .td: 6px 圆点放在 tab/label 前面提示在线状态) === */
+.td {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+.td-ok  { background: var(--cyan); }      /* 严禁红绿: ok=cyan 而非 green */
+.td-err { background: var(--magenta); }   /* err=magenta 而非 red */
+.td-w   { background: var(--yellow); }
+.td-unk { background: var(--dim); }
+
+/* === fn_fe 终端范式: pre 行内 inline span 染色 (.s/.e/.w/.m/.c/.mg/.b/.sd/.sh/.ch) ===
+   .s = success, .e = error, .w = warning, .m = muted, .c = cyan, .mg = magenta,
+   .b = blue, .sd = soft divider, .sh = section header (粗 magenta), .ch = column header.
+   严禁红绿 (M2): .s/.e 不映射 green/red, 仍走 cyan/magenta. */
+.s  { color: var(--cyan); }
+.e  { color: var(--magenta); }
+.w  { color: var(--yellow); }
+.m  { color: var(--dim); }
+.c  { color: var(--cyan); }
+.mg { color: var(--magenta); }
+.b  { color: var(--blue); }
+.sd { color: var(--dim); }
+.sh { color: var(--magenta); font-weight: bold; }
+.ch { color: var(--cyan); }
+
+/* === 命令行 prompt 行 (fn_fe .pl) === */
+.pl {
+  padding-top: 8px;
+  margin-top: 8px;
+  border-top: 1px solid var(--brdl);
+  font-size: 11px;
+}
+.pa { color: var(--cyan); }                /* prompt arrow ❯ — 严禁绿, 用 cyan */
+.pt { color: var(--blue); font-weight: bold; }
+.cur {
+  display: inline-block;
+  width: 1ch; height: 1.2em;
+  background: var(--txt);
+  animation: bk 1s step-end infinite;
+  vertical-align: text-bottom;
+}
+@keyframes bk { 50% { opacity: 0; } }
+
+/* === Braille spinner (fn_fe .sp; JS 在 80ms 间隔轮换 ⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏) === */
+.sp { color: var(--cyan); }
+
+/* === 紧凑动作按钮 (fn_fe .ab; 比 .btn 小一档, 用于 tab-bar 旁的工具条) === */
+.ab {
+  background: none;
+  border: 1px solid var(--brd);
+  color: var(--txt2);
+  padding: 2px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 10px;
+  transition: background .1s, color .1s, border-color .1s;
+}
+.ab:hover { background: var(--bgh); color: var(--txt); }
+.ab.p {
+  color: var(--blue);
+  border-color: var(--blue);
+}
+.ab.p:hover { background: rgba(2,37,199,0.06); }
+.ab.active {
+  background: var(--blue);
+  color: #fff;
+  border-color: var(--blue);
+}
+.ab:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* === 紧凑表单条 (fn_fe .if; 把 select/input/.ab 单行排在 tab 顶部) === */
+.if {
+  display: flex; gap: 6px;
+  align-items: center;
+  margin: 6px 0;
+  flex-wrap: wrap;
+}
+.if input, .if select {
+  font-family: inherit;
+  font-size: 11px;
+  padding: 2px 6px;
+  border: 1px solid var(--brd);
+  border-radius: 3px;
+  background: var(--bg);
+  color: var(--txt);
+}
+.if input:focus, .if select:focus {
+  outline: 1px solid var(--blue);
+  border-color: var(--blue);
+}
+
+/* === 错误盒 (fn_fe .ebox) — 严禁红绿: 用 magenta 而非 fn_fe 的红 === */
+.ebox {
+  background: rgba(201,48,199,0.08);
+  border: 1px solid var(--magenta);
+  color: var(--magenta);
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 11px;
+  margin: 4px 0;
+}
+
+/* ============================================================
+   Top app bar (跨页面). pre_ui 早期把它当 nav-pill 用; 现在
+   保留兼容样式, 同时鼓励新页面用 .tab-bar 替代 (见 components.appBar).
+   ============================================================ */
+.appbar {
+  display: flex; align-items: center; gap: 14px;
+  padding: 8px 14px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--brd);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.appbar .brand {
+  font-weight: 600; color: var(--blue);
+}
+.appbar .nav { display: flex; gap: 4px; flex-wrap: wrap; }
+.appbar .nav a {
+  padding: 4px 10px;
+  border-radius: 3px;
+  color: var(--txt2);
+  font-size: 12px;
+}
+.appbar .nav a:hover { background: var(--bgh); color: var(--txt); text-decoration: none; }
+.appbar .nav a.active { background: var(--bg); color: var(--blue); border: 1px solid var(--brd); padding: 3px 9px; }
+.appbar .grow { flex: 1; }
+.appbar .health {
+  font-size: 11px; color: var(--dim);
+  padding: 3px 8px; border: 1px solid var(--brd); border-radius: 3px;
+}
+.appbar .health.ok   { color: var(--cyan);    border-color: var(--cyan); }
+.appbar .health.warn { color: var(--yellow);  border-color: var(--yellow); }
+.appbar .health.err  { color: var(--magenta); border-color: var(--magenta); }
+
+/* ============================================================
+   Pills (state / role / level)
+   ============================================================ */
+.pill {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 10px;
+  border: 1px solid currentColor;
+  font-size: 10px;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.pill.dim    { color: var(--dim); }
+.pill.cyan   { color: var(--cyan); }
+.pill.yellow { color: var(--yellow); }
+.pill.blue   { color: var(--blue); }
+.pill.magenta{ color: var(--magenta); }
+
+.pill.st-idle                 { color: var(--st-idle); }
+.pill.st-busy                 { color: var(--st-busy); }
+.pill.st-thinking             { color: var(--st-thinking); }
+.pill.st-blocked              { color: var(--st-blocked); }
+.pill.st-blocked_user         { color: var(--st-blocked-user); }
+.pill.st-idle_with_proposals  { color: var(--st-idle-with-proposals); }
+.pill.st-error                { color: var(--st-error); }
+.pill.st-offline              { color: var(--st-offline); }
+.pill.st-stale                { color: var(--st-stale); }
+.pill.st-failed               { color: var(--st-failed); }
+
+/* 中文状态 chip — 终端密度 (跟 .pill 并列, 不抢眼但一眼能读) */
+.chip-zh {
+  display: inline-block;
+  padding: 1px 6px;
+  border: 1px dashed currentColor;
+  border-radius: 2px;
+  font-size: 10px;
+  line-height: 1.4;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+.chip-zh.chip-stale  { color: var(--dim); }
+.chip-zh.chip-failed { color: var(--magenta); border-style: solid; }
+
+.pill.role-ceo      { color: var(--role-ceo); }
+.pill.role-worker   { color: var(--role-worker); }
+.pill.role-freerun-worker  { color: var(--role-freerun); }
+.pill.role-observer { color: var(--role-observer); }
+
+.pill.sev-INFO     { color: var(--sev-info); }
+.pill.sev-WARNING  { color: var(--sev-warning); }
+.pill.sev-CRITICAL { color: var(--sev-critical); }
+
+/* prehook decisions list — 共用于 mobile + desktop */
+.prehook-list {
+  display: flex; flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+}
+.prehook-row {
+  display: flex; align-items: center; gap: 6px;
+  flex-wrap: wrap;
+}
+.prehook-row .prehook-ts { color: var(--dim); font-size: 10px; min-width: 60px; }
+.prehook-row .prehook-tool { color: var(--cyan); font-weight: 600; }
+.prehook-row .prehook-reason { color: var(--txt2); flex: 1; min-width: 0; word-break: break-word; }
+.prehook-row .prehook-source {
+  color: var(--dim); font-size: 9px;
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.prehook-input {
+  font-size: 10px; color: var(--dim);
+  font-family: inherit;
+  white-space: pre-wrap; word-break: break-word;
+  margin-left: 64px;
+  padding: 2px 0 4px 0;
+  border-bottom: 1px dashed var(--brdl);
+}
+.prehook-inline {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px;
+  padding: 4px 0;
+  flex-wrap: wrap;
+}
+.prehook-inline .prehook-reason {
+  color: var(--txt2); flex: 1; min-width: 0;
+  word-break: break-word;
+}
+.prehook-inline .prehook-source {
+  color: var(--dim); font-size: 9px;
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+
+/* ============================================================
+   Buttons (.btn — 比 .ab 大一档, 仍 monospace)
+   ============================================================ */
+.btn {
+  background: var(--bg);
+  border: 1px solid var(--brd);
+  color: var(--txt2);
+  padding: 4px 12px;
+  border-radius: 3px;
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.1s;
+  text-decoration: none;
+  display: inline-block;
+}
+.btn:hover { color: var(--txt); border-color: var(--txt2); background: var(--bgh); text-decoration: none; }
+.btn.primary { color: var(--blue);    border-color: var(--blue); }
+.btn.primary:hover { background: rgba(2,37,199,0.06); }
+.btn.warn    { color: var(--yellow);  border-color: var(--yellow); }
+.btn.warn:hover    { background: rgba(166,143,0,0.08); }
+.btn.accent  { color: var(--magenta); border-color: var(--magenta); }
+.btn.accent:hover  { background: rgba(201,48,199,0.06); }
+.btn.info    { color: var(--blue);    border-color: var(--blue); }
+.btn.info:hover    { background: rgba(2,37,199,0.06); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ============================================================
+   Inputs
+   ============================================================ */
+.input, textarea, select {
+  background: var(--bg);
+  border: 1px solid var(--brd);
+  color: var(--txt);
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-family: inherit;
+  font-size: 12px;
+}
+.input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--blue);
+}
+
+/* ============================================================
+   Tables
+   ============================================================ */
+.tbl { width: 100%; border-collapse: collapse; font-size: 11px; }
+.tbl th, .tbl td {
+  padding: 5px 10px; text-align: left;
+  border-bottom: 1px solid var(--brdl);
+  white-space: nowrap;
+}
+.tbl th {
+  color: var(--dim); font-weight: 500; font-size: 10px;
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+.tbl tbody tr:hover { background: var(--bgh); cursor: pointer; }
+.tbl tbody tr.selected { background: var(--bg3); }
+
+/* ============================================================
+   Cards / panels
+   ============================================================ */
+.card {
+  background: var(--bg);
+  border: 1px solid var(--brd);
+  border-radius: 4px;
+  padding: 10px 14px;
+  margin: 8px;
+}
+.card h2 {
+  font-size: 12px; font-weight: 600; color: var(--blue);
+  margin: 0 0 8px 0; letter-spacing: 0.04em; text-transform: uppercase;
+}
+
+/* ============================================================
+   Toast / banner
+   ============================================================ */
+.toast {
+  position: fixed; bottom: 16px; right: 16px;
+  background: var(--bg); border: 1px solid var(--cyan);
+  color: var(--cyan); padding: 8px 14px; border-radius: 4px;
+  font-size: 11px; z-index: 9999;
+  animation: fadein 0.15s ease-out;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+.toast.warn { border-color: var(--yellow);  color: var(--yellow); }
+.toast.err  { border-color: var(--magenta); color: var(--magenta); }
+@keyframes fadein { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+.banner {
+  background: var(--bg2); border-left: 3px solid var(--yellow);
+  color: var(--yellow); padding: 8px 14px; margin: 8px;
+  font-size: 11px;
+}
+.banner.info { border-color: var(--blue);    color: var(--blue); }
+.banner.err  { border-color: var(--magenta); color: var(--magenta); }
+
+/* ============================================================
+   Layout helpers
+   ============================================================ */
+.row { display: flex; gap: 8px; align-items: center; }
+.col { display: flex; flex-direction: column; gap: 8px; }
+.grow { flex: 1; }
+.dim { color: var(--dim); }
+.txt2 { color: var(--txt2); }
+.right { text-align: right; }
+.mono { font-family: inherit; }
+
+/* JS-friendly color helpers */
+.c-cyan    { color: var(--cyan); }
+.c-yellow  { color: var(--yellow); }
+.c-blue    { color: var(--blue); }
+.c-magenta { color: var(--magenta); }
+.c-dim     { color: var(--dim); }
+
+.hidden { display: none; }
+
+/* ============================================================
+   Modal
+   ============================================================ */
+.modal-bg {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+}
+.modal {
+  background: var(--bg);
+  border: 1px solid var(--brd);
+  border-radius: 6px;
+  padding: 16px 18px;
+  max-width: 80vw;
+  max-height: 85vh;
+  overflow: auto;
+  min-width: 480px;
+  box-shadow: 0 6px 24px rgba(0,0,0,.18);
+}
+.modal h3 { color: var(--magenta); font-size: 13px; margin: 0 0 10px 0; }
+
+/* ============================================================
+   Markdown content (DOMPurify-sanitized)
+   ============================================================ */
+.md-body { font-size: 12px; line-height: 1.6; }
+.md-body h1, .md-body h2, .md-body h3 { color: var(--blue); margin: 12px 0 6px; }
+.md-body code { background: var(--bg2); padding: 1px 4px; border-radius: 3px; }
+.md-body pre {
+  background: var(--bg2); padding: 8px 10px;
+  border: 1px solid var(--brd); border-radius: 3px; overflow-x: auto;
+}
+.md-body ul, .md-body ol { margin: 4px 0 4px 20px; }
+.md-body a { color: var(--blue); }
+.md-body a:hover { color: var(--cyan); }
+.md-body blockquote {
+  border-left: 2px solid var(--dim); margin: 4px 0;
+  padding-left: 10px; color: var(--txt2);
+}

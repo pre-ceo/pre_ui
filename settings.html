@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' http://127.0.0.1:19500; script-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'">
+<title>pre · settings</title>
+<link rel="stylesheet" href="shared/theme.css">
+<link rel="stylesheet" href="css/settings.css">
+</head>
+<body>
+<div id="appbar-host"></div>
+
+<div class="settings-wrap">
+  <div id="reason-banner" class="banner err hidden"></div>
+
+  <div class="card">
+    <h2>Bearer token</h2>
+
+    <div class="token-form">
+      <label>当前 token</label>
+      <div class="row">
+        <span class="mask" id="token-mask">-</span>
+        <span class="grow"></span>
+        <span class="dim" style="font-size:10px;">存于 localStorage · 跨重启保留 (clear 手动清)</span>
+      </div>
+
+      <label for="token-input">新 token</label>
+      <div class="row">
+        <input id="token-input"
+               type="password"
+               name="master_token"
+               autocomplete="off"
+               spellcheck="false"
+               placeholder="输入 master Bearer token (默认 pre)">
+        <button class="btn" id="show-btn" type="button" title="按住显示明文">show</button>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn primary" id="save-btn" type="button">save token</button>
+        <button class="btn warn" id="clear-btn" type="button">clear token</button>
+        <span class="grow"></span>
+        <button class="btn" id="ping-btn" type="button">ping /healthz</button>
+      </div>
+    </div>
+
+    <div class="status-line" id="status">尚未 ping</div>
+
+    <div class="tip">
+      · self-proxy 模式 (): 浏览器同 origin 5174 → 内部反代到 master 19500<br>
+      · master URL 在 server 端 (<code>scripts/fe_server.py --master ...</code>), 浏览器侧不可改<br>
+      · type=password + autocomplete=off, 截屏不泄露<br>
+      · localStorage (CLAUDE.md #5, single-user 本机): token 持久化, 跨重启免重输; clear 手动清<br>
+      · ping 走 <code>./healthz</code> 相对路径, 由 5174 反代到 master<br>
+      · 401 跳设置页时, 顶部 banner 提示原因
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>导航</h2>
+    <div class="row" style="gap:8px;">
+      <a class="btn" href="index.html">← back to home</a>
+      <a class="btn primary" href="agents.html">agents</a>
+    </div>
+  </div>
+</div>
+
+<script src="shared/vendor/dompurify.min.js"
+        integrity="sha384-eEu5CTj3qGvu9PdJuS+YlkNi7d2XxQROAFYOr59zgObtlcux1ae1Il3u7jvdCSWu"
+        crossorigin="anonymous"></script>
+<script src="shared/utils.js"></script>
+<script src="shared/fetch.js"></script>
+<script src="shared/components.js"></script>
+<script src="js/settings.js"></script>
+</body>
+</html>

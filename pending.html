@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' http://127.0.0.1:19500; script-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'">
+<title>pre · pending (Phase B preview)</title>
+<link rel="stylesheet" href="shared/theme.css">
+<link rel="stylesheet" href="css/pending.css">
+</head>
+<body>
+<!--
+  Phase B preview: 此文件由 /v3 期间所写, 历史保留 (宪法 "永不删").
+  Phase A 不在 appbar 暴露; agent-gov 放 Phase B 后再激活并接入主导航.
+-->
+<div id="appbar-host"></div>
+
+<div class="pending-layout">
+  <div class="p-list" id="p-list"><div class="dim p-12">loading...</div></div>
+  <div class="p-detail" id="p-detail">
+    <div class="card dim">选中左侧 pending 查看详情, 用 1/2/3 直接 decide</div>
+  </div>
+</div>
+
+<script src="shared/vendor/dompurify.min.js"
+        integrity="sha384-eEu5CTj3qGvu9PdJuS+YlkNi7d2XxQROAFYOr59zgObtlcux1ae1Il3u7jvdCSWu"
+        crossorigin="anonymous"></script>
+<script src="shared/utils.js"></script>
+<script src="shared/fetch.js"></script>
+<script src="shared/components.js"></script>
+<script src="js/pending.js"></script>
+</body>
+</html>

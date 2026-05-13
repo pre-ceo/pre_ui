@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' http://127.0.0.1:19500; script-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'">
+<title>pre · dispatches</title>
+<link rel="stylesheet" href="shared/theme.css">
+<link rel="stylesheet" href="css/dispatches.css">
+</head>
+<body>
+<div id="appbar-host"></div>
+
+<div class="dispatches-layout">
+  <div class="list-panel">
+    <div class="filter-bar">
+      <input class="input" id="f-search" placeholder="search dispatch_id..." autocomplete="off">
+      <select class="input" id="f-status">
+        <option value="">all status</option>
+        <option>in_progress_evaluation</option>
+        <option>approved_pending_executor</option>
+        <option>executing</option>
+        <option>done</option>
+        <option>rejected</option>
+        <option>abandoned</option>
+      </select>
+    </div>
+    <div class="dispatch-list" id="dispatch-list">
+      <div class="dim p-12">loading...</div>
+    </div>
+  </div>
+
+  <div class="detail-panel" id="detail-panel">
+    <div class="card detail-card dim">选中左侧 dispatch 查看 events 时间线</div>
+  </div>
+</div>
+
+<script src="shared/vendor/dompurify.min.js"
+        integrity="sha384-eEu5CTj3qGvu9PdJuS+YlkNi7d2XxQROAFYOr59zgObtlcux1ae1Il3u7jvdCSWu"
+        crossorigin="anonymous"></script>
+<script src="shared/vendor/marked.min.js"
+        integrity="sha384-lqPzN0kmFw9t2syAMwVPM4VbAyqsz/lPyYWbb2Xt6nSPM0WPNrpSWCUBgdcAdgnC"
+        crossorigin="anonymous"></script>
+<script src="shared/utils.js"></script>
+<script src="shared/fetch.js"></script>
+<script src="shared/components.js"></script>
+<script src="js/dispatches.js"></script>
+</body>
+</html>

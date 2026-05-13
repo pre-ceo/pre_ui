@@ -1,0 +1,206 @@
+/* pre_ui mobile — iOS 单页快速 decide
+   设计: 大触按钮 (≥ 44px tap target per Apple HIG), 单列, 暗色, 防误触 */
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0;
+  /* iOS Safari 底部 toolbar 高度 + safe-area */
+  padding-bottom: env(safe-area-inset-bottom);
+  background: var(--bg);
+  color: var(--txt);
+  font-size: 15px;          /* base 比 desktop (12) 大, iOS 易读 */
+  line-height: 1.4;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ---- 顶 bar ---- */
+.m-topbar {
+  position: sticky; top: 0;
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px;
+  padding-top: calc(10px + env(safe-area-inset-top));
+  background: var(--bg2);
+  border-bottom: 1px solid var(--brd);
+  z-index: 10;
+  font-size: 13px;
+}
+.m-brand { color: var(--cyan); font-weight: 600; }
+.m-grow { flex: 1; }
+.m-stats { color: var(--dim); font-size: 12px; }
+.m-health { color: var(--dim); font-size: 11px; padding: 2px 6px; border: 1px solid var(--brd); border-radius: 3px; }
+.m-health.ok { color: var(--cyan); border-color: var(--cyan); }
+.m-health.err { color: var(--magenta); border-color: var(--magenta); }
+
+/* ---- 列表 ---- */
+.m-list {
+  padding: 10px;
+  display: flex; flex-direction: column;
+  gap: 12px;
+}
+
+.m-empty {
+  margin-top: 60px;
+  text-align: center;
+  color: var(--dim);
+  font-size: 14px;
+  padding: 40px 20px;
+}
+.m-empty .big { color: var(--cyan); font-size: 22px; margin-bottom: 6px; display: block; }
+
+/* ---- agent 卡 (紧凑版, user 反馈 mobile 显示要紧凑) ---- */
+.m-card {
+  background: var(--bg2);
+  border: 1px solid var(--magenta);    /* magenta 边框 — 强调 "需要你的决策" */
+  border-radius: 8px;
+  padding: 10px;
+  display: flex; flex-direction: column;
+  gap: 6px;
+}
+.m-card .head {
+  display: flex; align-items: center; gap: 8px;
+  flex-wrap: wrap;
+}
+.m-card .agent-id { color: var(--txt); font-size: 14px; font-weight: 600; word-break: break-all; }
+.m-card .role { color: var(--dim); font-size: 11px; }
+.m-card .ago { color: var(--dim); font-size: 11px; margin-left: auto; white-space: nowrap; }
+.m-card .summary { color: var(--cyan); font-size: 14px; line-height: 1.5; }
+.m-card .summary.empty { color: var(--dim); font-style: italic; }
+.m-card .summary.fallback { color: var(--dim); }
+
+.m-card .pending-info {
+  background: var(--bg);
+  border: 1px solid var(--brd);
+  border-radius: 4px;
+  padding: 4px 8px;         /* 紧凑: 6/10 → 4/8 */
+  font-size: 14px;
+  line-height: 1.35;        /* 紧凑: 1.4 → 1.35 */
+  color: var(--txt);
+  white-space: pre-wrap; word-break: break-word;
+  margin: 0;
+}
+.m-card .pending-info.pending-key {
+  border: 2px solid var(--magenta);   /* pending tool 是核心决策点, magenta 强边框 */
+  font-size: 15px;
+  padding: 6px 10px;        /* key 块内 padding 略大但仍紧 */
+}
+.m-card .pending-info .label {
+  color: var(--magenta); font-size: 10px;
+  text-transform: uppercase; letter-spacing: 0.05em;
+  display: block; margin: 0 0 1px 0;   /* 紧凑: 0 0 2 0 → 0 0 1 0 */
+}
+
+.m-card .pane-summary,
+.m-card .last-response {
+  background: var(--bg);
+  border: 1px solid var(--brdl);
+  border-radius: 4px;
+  padding: 6px 8px;
+  font-size: 11px;
+  color: var(--txt2);
+  white-space: pre-wrap; word-break: break-word;
+  margin: 0;
+  /* 不内部滚动 — 跟随文本完全展开, 整个页面由 iOS Safari 滚动 */
+}
+.m-section-label {
+  color: var(--dim);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 2px;        /* 紧凑: 4 → 2 */
+  margin-bottom: 0;
+}
+
+/* ---- proposals 模式 卡 (yellow 边框, 与 blocked_user magenta 区分) ---- */
+.m-card.m-card-proposals {
+  border-color: var(--yellow);
+}
+.m-proposals-title {
+  color: var(--yellow);
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+.m-proposal {
+  background: var(--bg);
+  border: 1px solid var(--brd);
+  border-radius: 6px;
+  padding: 10px 12px;
+  display: flex; flex-direction: column;
+  gap: 6px;
+}
+.m-proposal-title { color: var(--cyan); font-size: 14px; font-weight: 600; }
+.m-proposal-rationale { color: var(--dim); font-size: 11px; }
+.m-proposal-text {
+  color: var(--txt2);
+  font-size: 12px;
+  white-space: pre-wrap; word-break: break-word;
+  background: var(--bg2);
+  padding: 6px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--brdl);
+}
+
+/* ---- decide 按钮: 4 个一行, 紧凑高度 ≥ 44px (Apple HIG min) ---- */
+.m-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;   /* 4 等分一行 */
+  gap: 6px;
+  margin-top: 4px;
+}
+.m-actions.m-actions-single {
+  grid-template-columns: 1fr;
+}
+.m-btn-wide {
+  width: 100%;
+}
+.m-btn {
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--bg);
+  border: 2px solid var(--brd);
+  color: var(--txt2);
+  padding: 8px 4px;
+  border-radius: 5px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 44px;          /* Apple HIG min, 同时 4 列也不挤 */
+  transition: transform 0.05s, background 0.1s;
+  text-align: center;
+  line-height: 1.1;
+}
+.m-btn:active { transform: scale(0.96); }
+.m-btn:disabled { opacity: 0.4; }
+
+.m-btn.primary  { color: var(--cyan);    border-color: var(--cyan); }
+.m-btn.warn     { color: var(--yellow);  border-color: var(--yellow); }
+.m-btn.info     { color: var(--blue);    border-color: var(--blue); }
+.m-btn.cancel   { color: var(--dim);     border-color: var(--dim); }
+.m-btn .key { display: block; font-size: 9px; color: var(--dim); margin-top: 1px; font-weight: 400; }
+/* m-actions-single 内 (跳过全部) 按钮回到大 */
+.m-actions.m-actions-single .m-btn { padding: 14px 12px; min-height: 56px; font-size: 16px; }
+
+/* ---- toast ---- */
+.m-toast {
+  position: fixed;
+  left: 12px; right: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  background: var(--bg2);
+  border: 1px solid var(--cyan);
+  color: var(--cyan);
+  padding: 12px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  z-index: 100;
+  display: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+}
+.m-toast.show { display: block; animation: slideup 0.15s ease-out; }
+.m-toast.warn { border-color: var(--yellow); color: var(--yellow); }
+.m-toast.err  { border-color: var(--magenta); color: var(--magenta); }
+@keyframes slideup {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}

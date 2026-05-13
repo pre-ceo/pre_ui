@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' http://127.0.0.1:19500; script-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'">
+<title>pre · notifications</title>
+<link rel="stylesheet" href="shared/theme.css">
+<link rel="stylesheet" href="css/notifications.css">
+</head>
+<body>
+<div id="appbar-host"></div>
+
+<div class="notif-wrap">
+  <div class="card">
+    <h2>Notifications · user.default audit
+      <span id="probed-ts" class="dim" style="font-weight:normal;font-size:11px;">- 条 · -</span>
+    </h2>
+
+    <div id="banner-host"></div>
+
+    <div class="filter-bar">
+      <select class="input" id="f-priority">
+        <option value="">all priority</option>
+        <option value="critical">critical</option>
+        <option value="high">high</option>
+        <option value="normal">normal</option>
+      </select>
+      <select class="input" id="f-channel">
+        <option value="">all channel</option>
+        <option value="webhook-notify">webhook-notify</option>
+        <option value="cli_sendkeys">cli_sendkeys</option>
+        <option value="master_log">master_log</option>
+      </select>
+      <input class="input" id="f-from" placeholder="from_agent..." autocomplete="off">
+      <select class="input" id="f-since">
+        <option value="3600">last 1h</option>
+        <option value="21600">last 6h</option>
+        <option value="86400" selected>last 24h</option>
+        <option value="604800">last 7d</option>
+        <option value="2592000">last 30d</option>
+      </select>
+      <select class="input" id="f-limit">
+        <option value="50">limit 50</option>
+        <option value="100" selected>limit 100</option>
+        <option value="200">limit 200</option>
+        <option value="500">limit 500 (max)</option>
+      </select>
+      <span class="grow"></span>
+      <button class="btn" id="btn-refresh">Refresh</button>
+      <span class="dim" style="font-size:10px;" id="src-label">mock</span>
+    </div>
+
+    <div id="notif-list" class="notif-list">
+      <div class="dim p-12">loading...</div>
+    </div>
+
+    <div class="dim" style="font-size:10px;margin-top:10px;">
+      mobile_audit 历史 (user.default) · 30s 自动刷新 · text_preview 已 server 端脱敏 · ≤30 天
+      · M1: VIRTUAL_AGENTS hardcoded server 端 · M4: polling 30/min 限频
+    </div>
+  </div>
+</div>
+
+<script src="shared/vendor/dompurify.min.js"
+        integrity="sha384-eEu5CTj3qGvu9PdJuS+YlkNi7d2XxQROAFYOr59zgObtlcux1ae1Il3u7jvdCSWu"
+        crossorigin="anonymous"></script>
+<script src="shared/utils.js"></script>
+<script src="shared/fetch.js"></script>
+<script src="shared/components.js"></script>
+<script src="js/notifications.js"></script>
+</body>
+</html>

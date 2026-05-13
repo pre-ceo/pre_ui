@@ -1,0 +1,61 @@
+/* pending.html page-specific (Phase B, 历史保留) */
+
+.pending-layout {
+  padding: 8px;
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 8px;
+  align-items: start;
+}
+.p-list {
+  border: 1px solid var(--brd); border-radius: 4px;
+  background: var(--bg2);
+}
+.p-row {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--brdl);
+  cursor: pointer;
+}
+.p-row:hover { background: var(--bgh); }
+.p-row.selected {
+  background: var(--bg3);
+  border-left: 2px solid var(--yellow);
+  padding-left: 8px;
+}
+.p-row .head {
+  display: flex; gap: 6px; align-items: center;
+  font-size: 11px;
+}
+.p-row .agent { color: var(--txt); font-size: 11px; word-break: break-all; }
+.p-row .ttl { color: var(--txt2); font-size: 11px; margin-top: 2px; }
+
+.p-detail { /* 不内部滚, 跟随页面滚动 */ }
+
+.opt {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 8px 10px;
+  border: 1px solid var(--brd);
+  border-radius: 4px;
+  margin: 6px 0;
+  cursor: pointer;
+  background: var(--bg2);
+}
+.opt:hover { background: var(--bgh); }
+.opt.focused { border-color: var(--cyan); background: var(--bg3); }
+.opt .num {
+  width: 22px; height: 22px; border-radius: 11px;
+  border: 1px solid var(--cyan); color: var(--cyan);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 11px; flex-shrink: 0;
+}
+.opt .body { flex: 1; font-size: 11px; line-height: 1.5; white-space: pre-wrap; }
+.opt .key { color: var(--dim); font-size: 10px; }
+.opt-body { margin-top: 4px; color: var(--txt2); }
+
+.kvs-narrow { display: grid; grid-template-columns: 90px 1fr; gap: 4px 12px; font-size: 11px; }
+.prompt { margin-top: 10px; }
+
+.kbar { font-size: 10px; color: var(--dim); margin-top: 8px; }
+.kbar code { background: var(--bg2); padding: 1px 4px; border-radius: 2px; color: var(--cyan); }
+
+.p-12 { padding: 12px; }

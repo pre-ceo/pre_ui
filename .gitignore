@@ -1,0 +1,24 @@
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Python (fe_server.py is stdlib only, but venvs and caches still appear)
+__pycache__/
+*.pyc
+.venv/
+
+# Runtime / local
+logs/
+config.json
+agents/
+
+# Claude Code project local
+.claude/settings.local.json
+
+# pre_ui agent runtime workspace state (per-machine, not source)
+pre/.done
+pre/findings/
+pre/findings_seen.json
+pre/reports/

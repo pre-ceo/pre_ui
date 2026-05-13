@@ -1,0 +1,131 @@
+/* usage.html — LLM cli quota tab () */
+
+.usage-wrap {
+  padding: 8px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.node-tabs {
+  display: flex; gap: 4px; flex-wrap: wrap;
+  margin: 6px 0 4px 0;
+}
+.node-tabs .node-tab {
+  padding: 4px 12px;
+  border: 1px solid var(--brd);
+  border-radius: 3px;
+  font-size: 11px;
+  color: var(--txt2);
+  background: var(--bg);
+  cursor: pointer;
+  user-select: none;
+}
+.node-tabs .node-tab:hover { color: var(--txt); border-color: var(--txt2); }
+.node-tabs .node-tab.active {
+  color: var(--cyan);
+  border-color: var(--cyan);
+  background: var(--bg2);
+}
+
+/* stale / fail / no-data banner */
+.usage-banner {
+  padding: 6px 10px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  font-size: 11px;
+  border-left: 3px solid var(--yellow);
+  background: var(--bg2);
+  color: var(--yellow);
+}
+.usage-banner.usage-banner-fail {
+  border-left-color: var(--magenta);
+  color: var(--magenta);
+}
+
+/* stale row: 整 row dim 化, 但保留可读 */
+.usage-row.usage-row-stale {
+  opacity: 0.65;
+}
+
+.usage-list {
+  display: flex; flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.usage-row {
+  border: 1px solid var(--brd);
+  border-radius: 4px;
+  background: var(--bg2);
+  padding: 10px 12px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.usage-row .head {
+  display: flex; align-items: center; gap: 10px;
+  flex-wrap: wrap;
+}
+.usage-row .provider {
+  color: var(--cyan);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  min-width: 70px;
+}
+.usage-row .meta { display: flex; gap: 14px; flex-wrap: wrap; font-size: 11px; }
+.usage-row .meta .k { color: var(--dim); margin-right: 4px; }
+.usage-row .meta .v { color: var(--txt); }
+.usage-row .meta .v.warn { color: var(--yellow); }
+.usage-row .meta .v.crit { color: var(--magenta); }
+
+/* 进度条 */
+.usage-bar {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px;
+}
+.usage-bar .label { color: var(--dim); min-width: 60px; }
+.usage-bar .pct { color: var(--txt); min-width: 38px; text-align: right; }
+.usage-bar .reset { color: var(--dim); font-size: 10px; }
+.usage-bar .track {
+  flex: 1;
+  height: 6px;
+  background: var(--bg);
+  border: 1px solid var(--brd);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.usage-bar .fill {
+  height: 100%;
+  background: var(--cyan);
+  transition: width 0.2s;
+}
+.usage-bar .fill.warn { background: var(--yellow); }
+.usage-bar .fill.crit { background: var(--magenta); }
+
+/* raw 折叠区 */
+.usage-raw-toggle {
+  font-size: 10px;
+  color: var(--dim);
+  cursor: pointer;
+  padding: 2px 0;
+  user-select: none;
+}
+.usage-raw-toggle:hover { color: var(--blue); }
+
+.usage-raw {
+  display: none;
+  background: var(--bg);
+  border: 1px solid var(--brd);
+  border-radius: 3px;
+  padding: 6px 8px;
+  font-size: 10px;
+  color: var(--txt2);
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+}
+.usage-row.expanded .usage-raw { display: block; }
+.usage-row.expanded .usage-raw-toggle::before { content: "▼ "; }
+.usage-row:not(.expanded) .usage-raw-toggle::before { content: "▶ "; }
+
+.p-12 { padding: 12px; }

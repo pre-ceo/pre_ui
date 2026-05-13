@@ -1,0 +1,97 @@
+{
+  "_note": "Mock data for Notifications tab UI development. Shape mirrors pre's expected GET /api/v1/notify/audit response (M3 9-field schema). text_preview 已含 6 类敏感模式占位符示例 (A2 视觉高亮测试).",
+  "items": [
+    {
+      "ts": "2026-05-01T01:30:15+00:00",
+      "from_agent": "local.cli-claude-code-local.batpm",
+      "to_agent": "user.dr_li",
+      "priority": "critical",
+      "channel": "webhook-notify",
+      "status": "sent",
+      "error": null,
+      "payload_size": 312,
+      "text_preview": "batpm equity=0 异常 / NILSAPN_KEY=[REDACTED] / aws=[AWS_KEY] / token=[REDACTED]"
+    },
+    {
+      "ts": "2026-05-01T01:25:42+00:00",
+      "from_agent": "local.cli-claude-code-local.pre",
+      "to_agent": "user.dr_li",
+      "priority": "high",
+      "channel": "cli_sendkeys",
+      "status": "sent",
+      "error": null,
+      "payload_size": 145,
+      "text_preview": "dispatch 260501-004 task_verdict approved, command 已派 executor [UUID]"
+    },
+    {
+      "ts": "2026-05-01T01:20:08+00:00",
+      "from_agent": "local.cli-claude-code-local.agent-arch",
+      "to_agent": "user.dr_li",
+      "priority": "normal",
+      "channel": "master_log",
+      "status": "sent",
+      "error": null,
+      "payload_size": 88,
+      "text_preview": "V2 升级架构评审完成, 5 must_have 已注入"
+    },
+    {
+      "ts": "2026-05-01T01:15:33+00:00",
+      "from_agent": "local.cli-claude-code-local.agent-research",
+      "to_agent": "user.dr_li",
+      "priority": "high",
+      "channel": "webhook-notify",
+      "status": "error",
+      "error": "HTTP 502 from webhook-notify upstream (sentry id: [UUID])",
+      "payload_size": 192,
+      "text_preview": "agent-research 策略异常 ssh=[SSH_KEY_PATH] / Bearer [REDACTED]"
+    },
+    {
+      "ts": "2026-05-01T01:10:21+00:00",
+      "from_agent": "local.cli-claude-code-local.agent-security",
+      "to_agent": "user.dr_li",
+      "priority": "critical",
+      "channel": "webhook-notify",
+      "status": "sent",
+      "error": null,
+      "payload_size": 268,
+      "text_preview": "P0 critical_finding: hardcoded NILSAPN_GROUP_ID=[UUID] in batpm/...pushNotification.ts:10"
+    },
+    {
+      "ts": "2026-05-01T00:55:11+00:00",
+      "from_agent": "local.cli-claude-code-local.fn_dispatcher",
+      "to_agent": "user.dr_li",
+      "priority": "normal",
+      "channel": "cli_sendkeys",
+      "status": "sent",
+      "error": null,
+      "payload_size": 76,
+      "text_preview": "dispatch 260501-001 closed (gwchain rename done)"
+    },
+    {
+      "ts": "2026-04-30T22:30:55+00:00",
+      "from_agent": "local.cli-claude-code-local.agent-gov",
+      "to_agent": "user.dr_li",
+      "priority": "normal",
+      "channel": "master_log",
+      "status": "sent",
+      "error": null,
+      "payload_size": 102,
+      "text_preview": "AP-005 violation 评估 ROI 阶梯 ¥5680-7952"
+    },
+    {
+      "ts": "2026-04-30T18:12:05+00:00",
+      "from_agent": "local.cli-claude-code-local.pre_ui",
+      "to_agent": "user.dr_li",
+      "priority": "high",
+      "channel": "webhook-notify",
+      "status": "sent",
+      "error": null,
+      "payload_size": 156,
+      "text_preview": "GUI proposals 接入完成 commit 7a7fdd5, push 已上"
+    }
+  ],
+  "total": 8,
+  "since": "2026-04-30T18:00:00+00:00",
+  "limit": 500,
+  "_mock_note": "8 entries demonstrate: 5 channel types (webhook-notify/cli_sendkeys/master_log), 3 priority (critical/high/normal), 2 status (sent/error), 6 redact placeholder types ([REDACTED]/[AWS_KEY]/[UUID]/[SSH_KEY_PATH]). Real master returns same shape per pre endpoint impl."
+}

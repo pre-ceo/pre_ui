@@ -1,0 +1,53 @@
+/* settings.html page-specific */
+
+.settings-wrap {
+  max-width: 640px;
+  margin: 16px auto;
+  padding: 0 12px;
+}
+
+.token-form {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 8px 12px;
+  align-items: center;
+  font-size: 11px;
+}
+.token-form label { color: var(--dim); }
+.token-form .row {
+  display: flex; gap: 6px; align-items: center;
+}
+.token-form input[type=password],
+.token-form input[type=text] {
+  flex: 1; min-width: 0;
+}
+.token-form .mask {
+  font-family: inherit; color: var(--cyan);
+  letter-spacing: 0.05em;
+}
+
+.btn-row {
+  display: flex; gap: 6px; margin-top: 8px;
+  grid-column: 1 / -1;
+}
+
+.status-line {
+  margin-top: 12px;
+  padding: 8px 10px;
+  background: var(--bg2);
+  border: 1px solid var(--brd);
+  border-radius: 3px;
+  font-size: 11px;
+  min-height: 28px;
+}
+
+.banner.hidden { display: none; }
+
+.tip {
+  margin-top: 14px; padding: 10px;
+  background: var(--bg2);
+  border-left: 2px solid var(--blue);
+  font-size: 11px; color: var(--txt2);
+  line-height: 1.7;
+}
+.tip code { background: var(--bg3); color: var(--cyan); padding: 1px 4px; border-radius: 2px; }

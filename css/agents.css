@@ -1,0 +1,435 @@
+/* agents.html page-specific styles */
+
+/* Discord 式 3 列布局, 撑满 #app-content; 每列自己做内部 scroll, 整页不滚.
+   col1: node tabs (all/local/virtual.user 垂直按钮)
+   col2: filter bar + agent list
+   col3: detail-panel = chat container (title + messages + input)
+   gap=0, 列间靠 1px border 分隔, "左侧列表跟右侧 container 连一起". */
+.agents-layout {
+  display: grid;
+  grid-template-columns: 130px 280px 1fr;
+  gap: 0;
+  padding: 0;
+  height: 100%;
+  align-items: stretch;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.node-col   { display: flex; flex-direction: column; min-height: 0; overflow-y: auto;
+              background: var(--bg2); border-right: 1px solid var(--brd);
+              padding: 8px 6px; gap: 4px; }
+.list-panel { display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+              background: var(--bg2); border-right: 1px solid var(--brd); }
+.detail-panel { display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+                background: var(--bg); }
+
+/* node-col: 垂直 tab — 终端 ls 列表风, 无 box, 用 prompt arrow 标 active */
+.node-col .node-tab {
+  padding: 3px 8px 3px 14px;
+  font-size: 11px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--txt2);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+}
+.node-col .node-tab::before {
+  content: '';
+  position: absolute; left: 4px; top: 50%;
+  transform: translateY(-50%);
+  color: transparent;
+  font-size: 11px;
+}
+.node-col .node-tab:hover { color: var(--txt); background: var(--bgh); }
+.node-col .node-tab.active {
+  background: var(--bg);
+  color: var(--cyan);
+  border-color: var(--brd);
+  font-weight: 600;
+}
+.node-col .node-tab.active::before { content: '❯'; color: var(--cyan); }
+.node-col .node-tab .count {
+  margin-left: auto;
+  color: var(--dim);
+  font-size: 10px;
+}
+.node-col .node-tab.active .count { color: var(--cyan); }
+
+/* list-panel: filter-bar 顶 + agent-list 自滚 */
+.list-panel .filter-bar { flex-shrink: 0; }
+
+.agent-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  background: var(--bg2);
+  border-radius: 0;
+  /* 终端"行"质感: 顶上沿用一条 dim 横线分隔 */
+  border-top: 1px solid var(--brdl);
+}
+/* row 紧凑终端密度: 2px gap, 10px h padding, 4px v padding;
+   selected 用左侧 cyan 竖条 (.terminal cursor 风格), 不变背景, 避免色块跳变 */
+.agent-row {
+  padding: 4px 10px 5px 10px;
+  border-bottom: 1px solid var(--brdl);
+  border-left: 2px solid transparent;
+  cursor: pointer;
+  display: flex; flex-direction: column; gap: 2px;
+  font-size: 11px;
+  position: relative;
+}
+.agent-row:hover { background: var(--bgh); }
+.agent-row.selected {
+  background: var(--bg);
+  border-left-color: var(--cyan);
+}
+.agent-row .id {
+  font-size: 11px;
+  color: var(--txt);
+  display: flex; align-items: center; gap: 6px;
+  font-weight: 500;
+}
+.agent-row .id .td { margin: 0; flex-shrink: 0; }
+.agent-row .meta { display: flex; gap: 6px; font-size: 10px; color: var(--dim); align-items: center; flex-wrap: wrap; }
+
+/* stale (未接管) — 整行 dim, 老 agent 沉底视觉信号 */
+.agent-row.stale {
+  opacity: 0.55;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent, transparent 6px,
+    rgba(0,0,0,0.015) 6px, rgba(0,0,0,0.015) 7px);
+  border-left-color: var(--dim);
+}
+.agent-row.stale:hover { opacity: 0.85; background: var(--bgh); }
+.agent-row.stale.selected { opacity: 0.9; border-left-color: var(--cyan); }
+.agent-row.stale .id { color: var(--txt2); font-weight: normal; }
+
+/* failed — 配置坏, magenta 警示, 不 dim, 仍是 actionable */
+.agent-row.failed {
+  border-left-color: var(--magenta);
+  background: rgba(201,48,199,0.04);
+}
+.agent-row.failed:hover { background: rgba(201,48,199,0.08); }
+.agent-row.failed .id { color: var(--magenta); }
+
+/* failure-line — 替代 stale/failed 时的 now-line, 显 failure_reason 短文本 */
+.agent-row .failure-line {
+  font-size: 10px;
+  color: var(--dim);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-style: italic;
+}
+.agent-row .failure-line.failed { color: var(--magenta); font-style: normal; }
+.agent-row .failure-line.stale  { color: var(--dim); }
+.agent-row .task-line {
+  font-size: 10px;
+  color: var(--txt2);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* normal: LLM task_summary 实质内容, 用主色 */
+.agent-row .task-line.normal { color: var(--cyan); }
+/* empty: task_summary === '空闲', dim 斜体 */
+.agent-row .task-line.empty { color: var(--dim); font-style: italic; }
+/* fallback: task_summary 不可用, fallback 到 task_title (派单背景, 弱化) */
+.agent-row .task-line.fallback { color: var(--dim); }
+
+/* 详情卡 task_summary banner: 突出 LLM 实时总结 */
+.task-summary-banner {
+  font-size: 13px;
+  color: var(--cyan);
+  margin: 6px 0 8px 0;
+  padding: 4px 0 4px 8px;
+  border-left: 2px solid var(--cyan);
+  display: flex; align-items: baseline; gap: 6px;
+}
+.task-summary-banner.empty {
+  color: var(--dim); font-style: italic;
+  border-left-color: var(--dim);
+}
+.task-summary-banner.fallback {
+  color: var(--dim);
+  border-left-color: var(--dim);
+}
+
+/* node-tabs (旧顶部水平 pill) — 现已用上面 .node-col 垂直版本替代.
+   保留 .node-tabs 选择器供 usage.html / agents 老入口兼容, 但 SPA 不再走这条路径. */
+.node-tabs {
+  display: flex; gap: 4px; padding: 6px 6px 0 6px;
+  background: var(--bg2);
+  flex-wrap: wrap;
+}
+
+.filter-bar {
+  display: flex; gap: 6px; padding: 6px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--brd);
+}
+.filter-bar select, .filter-bar input { flex: 1; min-width: 0; }
+
+.detail-card { margin: 0 0 8px 0; }
+.kvs { display: grid; grid-template-columns: 110px 1fr; gap: 4px 12px; font-size: 11px; }
+.kvs .k { color: var(--dim); }
+.kvs .v { word-break: break-all; }
+
+.send-box { display: flex; flex-direction: column; gap: 6px; }
+.send-box .row1 { display: flex; gap: 6px; }
+.send-box select { width: 140px; }
+.send-box textarea { width: 100%; min-height: 70px; resize: vertical; }
+.send-box .hint { color: var(--dim); font-size: 10px; }
+
+/* 精简后的 agent header card (260430): 单行 id + state + role */
+.agent-header h2 { font-size: 13px; margin: 0; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.agent-header .agent-meta {
+  font-size: 11px;
+  margin-top: 4px;
+  word-break: break-all;
+}
+
+/* pending-card desktop 版 (与 mobile.m-card .pending-info 对应) */
+.pending-card {
+  margin: 10px 0;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.pending-card .pending-info {
+  background: var(--bg);
+  border: 1px solid var(--brd);
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--txt);
+  white-space: pre-wrap; word-break: break-word;
+  margin: 0;
+}
+.pending-card .pending-info.pending-key {
+  border: 2px solid var(--magenta);
+  font-size: 13px;
+  padding: 8px 12px;
+}
+.pending-card .pending-info .label {
+  color: var(--magenta); font-size: 10px;
+  text-transform: uppercase; letter-spacing: 0.05em;
+  display: block; margin: 0 0 2px 0;
+}
+
+.p-12 { padding: 12px; }
+
+/* now-line: 列表行副标题, 显示 recent_actions[0] (当前在做) */
+.agent-row .now-line {
+  font-size: 10px;
+  color: var(--dim);
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.agent-row .now-line .tool { color: var(--cyan); }
+
+/* mini-tasks button + modal */
+.agent-row .row-actions {
+  display: flex; gap: 4px; margin-top: 2px;
+}
+.agent-row .row-actions .btn {
+  font-size: 10px; padding: 2px 8px;
+}
+.mt-list-head {
+  display: flex; align-items: center; gap: 8px;
+  padding-bottom: 6px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--brdl);
+  font-size: 11px;
+}
+.mt-list { display: flex; flex-direction: column; gap: 6px; }
+.mt-row {
+  border: 1px solid var(--brd);
+  border-radius: 4px;
+  background: var(--bg2);
+  padding: 8px 10px;
+}
+.mt-row.expanded { border-color: var(--cyan); }
+.mt-row-head {
+  display: flex; align-items: center; gap: 8px;
+  cursor: pointer;
+  font-size: 11px;
+}
+.mt-row-head .ts { color: var(--txt2); min-width: 60px; }
+.mt-row-head .mt-toggle { color: var(--blue); font-size: 10px; }
+.mt-row-head .mt-dispatch { color: var(--blue); text-decoration: none; }
+.mt-row-head .mt-dispatch:hover { color: var(--cyan); text-decoration: underline; }
+.mt-req-preview {
+  font-size: 11px; color: var(--txt);
+  margin-top: 4px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.mt-detail { display: none; }
+.mt-row.expanded .mt-detail { display: block; margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--brdl); }
+
+.mt-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  font-size: 10px; color: var(--dim);
+  padding: 6px 0;
+}
+.mt-meta a { color: var(--blue); }
+.mt-meta a:hover { color: var(--cyan); text-decoration: underline; }
+
+.mt-section { margin: 10px 0; }
+.mt-section-label {
+  color: var(--dim); font-size: 10px;
+  text-transform: uppercase; letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+.mt-actions { display: flex; flex-direction: column; gap: 3px; font-size: 11px; }
+.mt-action {
+  display: flex; gap: 6px;
+  padding: 3px 6px;
+  background: var(--bg);
+  border-radius: 3px;
+  word-break: break-word;
+}
+.mt-action-tag {
+  font-size: 9px;
+  font-weight: 600;
+  flex-shrink: 0;
+  min-width: 38px;
+  text-transform: uppercase;
+}
+.mt-action-assistant_text .mt-action-tag { color: var(--blue); }
+.mt-action-tool_use .mt-action-tag { color: var(--yellow); }
+.mt-action-tool_result .mt-action-tag { color: var(--cyan); }
+.mt-action-name { color: var(--cyan); font-weight: 600; flex-shrink: 0; }
+.mt-action-text { color: var(--txt2); flex: 1; min-width: 0; white-space: pre-wrap; }
+
+/* dispatch-link: cross-ref to dispatches tab */
+.agent-row .dispatch-link {
+  font-size: 10px;
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.agent-row .dispatch-link a {
+  color: var(--blue);
+  text-decoration: none;
+}
+.agent-row .dispatch-link a:hover {
+  color: var(--cyan);
+  text-decoration: underline;
+}
+
+/* recent_actions: 详情卡内 5 行工具调用 */
+.recent-actions { font-size: 11px; line-height: 1.6; }
+.recent-actions .ra-row {
+  padding: 2px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.recent-actions .tool { color: var(--cyan); display: inline-block; min-width: 60px; }
+.recent-actions .summary { color: var(--dim); }
+
+/* last_response_excerpt: agent 自己的"我在做啥"总结, 自然高度 */
+.last-response {
+  font-size: 11px;
+  background: var(--bg);
+  padding: 6px 8px;
+  border: 1px solid var(--brd);
+  border-radius: 3px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+}
+
+/* pane_summary 折叠: <details><summary>...</summary><pre>...</pre></details> */
+.pane-details { margin-top: 10px; }
+.pane-details summary { padding: 4px 0; }
+.pane-details summary:hover { color: var(--txt2); }
+
+/* pane_summary block — 高度跟随文本, 不用内部滚动 (user 偏好) */
+.pane-summary {
+  font-size: 11px;
+  background: var(--bg);
+  padding: 6px 8px;
+  border: 1px solid var(--brd);
+  border-radius: 3px;
+  white-space: pre-wrap;     /* 长行换行, 避免横向溢出 */
+  word-break: break-word;
+  margin: 0;
+}
+
+/* proposals muted notice (): 提示 proposals 已被 mute, 提供 [启用] */
+.proposals-muted-notice {
+  display: flex; align-items: center; gap: 8px;
+  margin: 8px 0;
+  padding: 6px 10px;
+  background: var(--bg);
+  border: 1px dashed var(--brd);
+  border-radius: 4px;
+  font-size: 11px;
+}
+.proposals-muted-notice .btn { font-size: 11px; padding: 3px 10px; }
+
+/* proposals section (idle_with_proposals 时显示, 260429.X) */
+.proposals-section {
+  margin: 8px 0;
+  padding: 8px 10px;
+  background: var(--bg);
+  border: 1px solid var(--yellow);   /* yellow 边框 — 等用户选下一步 (比 blocked magenta 弱) */
+  border-radius: 4px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.proposals-head {
+  display: flex; align-items: center; gap: 8px;
+}
+.proposals-title { color: var(--yellow); font-size: 11px; font-weight: 600; }
+
+.proposal-card {
+  border: 1px solid var(--brd);
+  border-radius: 4px;
+  padding: 8px 10px;
+  background: var(--bg2);
+  display: flex; flex-direction: column; gap: 4px;
+}
+.proposal-head {
+  display: flex; align-items: center; gap: 8px;
+}
+.proposal-title { color: var(--cyan); font-size: 12px; font-weight: 600; flex: 1; word-break: break-word; }
+.proposal-choose { font-size: 11px; padding: 4px 12px; flex-shrink: 0; }
+.proposal-rationale { color: var(--dim); font-size: 11px; }
+.proposal-text {
+  color: var(--txt2);
+  font-size: 11px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: var(--bg);
+  padding: 4px 8px;
+  border-radius: 3px;
+  border: 1px solid var(--brdl);
+  margin-top: 2px;
+}
+
+/* decide bar (blocked_user 时显示) */
+.decide-bar {
+  display: flex; gap: 6px; align-items: center;
+  margin-top: 10px; padding: 8px 10px;
+  background: var(--bg);
+  border: 1px solid var(--magenta);
+  border-radius: 4px;
+  flex-wrap: wrap;
+}
+.decide-bar button { font-size: 11px; padding: 4px 12px; }

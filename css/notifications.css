@@ -1,0 +1,142 @@
+/* notifications.html — mobile_audit 历史 UI () */
+
+.notif-wrap {
+  padding: 8px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* banner: stale / fail / 429 */
+.notif-banner {
+  padding: 6px 10px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  font-size: 11px;
+  border-left: 3px solid var(--yellow);
+  background: var(--bg2);
+  color: var(--yellow);
+}
+.notif-banner.fail { border-left-color: var(--magenta); color: var(--magenta); }
+.notif-banner.rate-limit { border-left-color: var(--magenta); color: var(--magenta); }
+
+/* filter bar */
+.filter-bar {
+  display: flex; gap: 6px;
+  margin: 8px 0;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.filter-bar .input { font-size: 11px; padding: 3px 8px; }
+.filter-bar select.input { min-width: 100px; }
+.filter-bar input#f-from { width: 200px; }
+
+/* 列表 */
+.notif-list {
+  display: flex; flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+/* row 紧凑表格状 */
+.notif-row {
+  display: grid;
+  grid-template-columns: 70px 1fr 90px 90px 110px 60px 60px 16px;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 10px;
+  background: var(--bg2);
+  border: 1px solid var(--brd);
+  border-radius: 3px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.05s;
+}
+.notif-row:hover { background: var(--bgh); }
+.notif-row.expanded {
+  border-color: var(--cyan);
+  display: flex; flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  cursor: default;
+}
+
+.notif-row .col-ts { color: var(--dim); white-space: nowrap; }
+.notif-row .col-from { color: var(--cyan); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.notif-row .col-to { color: var(--txt2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.notif-row .col-pri,
+.notif-row .col-chan { white-space: nowrap; }
+.notif-row .col-status {
+  font-size: 9px; font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.notif-row .col-status.sent { color: var(--cyan); }
+.notif-row .col-status.error { color: var(--magenta); }
+.notif-row .col-size { color: var(--dim); white-space: nowrap; text-align: right; }
+.notif-row .col-toggle { color: var(--blue); font-size: 10px; text-align: right; }
+
+/* 展开后内部布局 */
+.notif-row.expanded .row-head {
+  display: grid;
+  grid-template-columns: 70px 1fr 90px 90px 110px 60px 60px 16px;
+  gap: 8px;
+  align-items: center;
+}
+.notif-row.expanded .row-detail {
+  font-size: 11px;
+  border-top: 1px dashed var(--brdl);
+  padding-top: 8px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.notif-row.expanded .row-detail .label {
+  color: var(--dim); font-size: 10px;
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+.notif-row.expanded .preview-block {
+  background: var(--bg);
+  border: 1px solid var(--brd);
+  border-radius: 3px;
+  padding: 6px 8px;
+  white-space: pre-wrap; word-break: break-word;
+  color: var(--txt);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.notif-row.expanded .error-block {
+  background: var(--bg);
+  border-left: 2px solid var(--magenta);
+  padding: 4px 8px;
+  color: var(--magenta);
+  font-size: 11px;
+  white-space: pre-wrap; word-break: break-word;
+}
+
+/* A2: redact 占位符 yellow 高亮 (text-only, 不在 a/href 中) */
+.redact-hl {
+  background: var(--bg);
+  color: var(--yellow);
+  padding: 0 4px;
+  border-radius: 2px;
+  font-weight: 600;
+}
+
+/* header 列标 (sticky) */
+.notif-list-header {
+  display: grid;
+  grid-template-columns: 70px 1fr 90px 90px 110px 60px 60px 16px;
+  gap: 8px;
+  padding: 4px 10px;
+  font-size: 10px;
+  color: var(--dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--brd);
+  margin-bottom: 4px;
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  z-index: 5;
+}
+
+.p-12 { padding: 12px; }

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' http://127.0.0.1:19500; script-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'">
+<title>pre · agents</title>
+<link rel="stylesheet" href="shared/theme.css">
+<link rel="stylesheet" href="css/agents.css">
+<link rel="stylesheet" href="css/chat.css">
+</head>
+<body>
+<div id="appbar-host"></div>
+
+<div class="agents-layout">
+  <div class="list-panel">
+    <div id="node-tabs" class="node-tabs"></div>
+    <div class="filter-bar">
+      <input class="input" id="f-search" placeholder="search agent_id..." autocomplete="off">
+      <select class="input" id="f-state">
+        <option value="">all states</option>
+        <option>idle</option><option>busy</option><option>blocked</option>
+        <option>error</option><option>offline</option><option>thinking</option><option>unknown</option>
+      </select>
+      <select class="input" id="f-role">
+        <option value="">all roles</option>
+        <option>CEO</option><option>worker</option><option>freerun-worker</option><option>observer</option>
+      </select>
+    </div>
+    <div class="agent-list" id="agent-list">
+      <div class="dim p-12">loading...</div>
+    </div>
+  </div>
+
+  <div class="detail-panel" id="detail-panel">
+    <div class="card detail-card dim">选中左侧 agent 查看详情 (Phase A: metadata + send command)</div>
+  </div>
+</div>
+
+<script src="shared/vendor/dompurify.min.js"
+        integrity="sha384-eEu5CTj3qGvu9PdJuS+YlkNi7d2XxQROAFYOr59zgObtlcux1ae1Il3u7jvdCSWu"
+        crossorigin="anonymous"></script>
+<script src="shared/utils.js"></script>
+<script src="shared/fetch.js"></script>
+<script src="shared/components.js"></script>
+<script src="js/chat.js"></script>
+<script src="js/agents.js"></script>
+</body>
+</html>
