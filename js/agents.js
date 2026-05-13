@@ -184,10 +184,10 @@
     const dispatchLine = act.current_dispatch_id
       ? `<div class="dispatch-link"><a href="dispatches.html?dispatch=${encodeURIComponent(act.current_dispatch_id)}" data-stop="1">→ ${U.esc(act.current_dispatch_id)}</a> <span class="dim">${U.esc(act.current_dispatch_role || '?')} · ${U.esc(act.current_dispatch_status || '?')}</span></div>`
       : '';
-    // mini-tasks 入口 stale/failed 时无意义 (历史 agent, mini_task 也是老的) — 隐藏减干扰
-    const miniTasksBtn = (st === 'stale' || st === 'failed')
-      ? ''
-      : `<div class="row-actions"><a class="btn" data-stop="1" href="tasks.html?mode=mini&agent=${encodeURIComponent(a.agent_id)}" target="_blank" rel="noopener noreferrer">Mini Tasks ↗</a></div>`;
+    // mini-tasks 特性当前整体隐藏 (per user); 恢复时改回:
+    //   const miniTasksBtn = (st === 'stale' || st === 'failed')
+    //     ? '' : `<div class="row-actions"><a class="btn" data-stop="1" href="tasks.html?mode=mini&agent=${encodeURIComponent(a.agent_id)}" target="_blank" rel="noopener noreferrer">Mini Tasks ↗</a></div>`;
+    const miniTasksBtn = '';
     // 中文 status chip — 跟左侧 fn_fe 状态 pill 并列, 让用户一眼读懂
     let zhChip = '';
     if (st === 'stale')  zhChip = `<span class="chip-zh chip-stale">未接管</span>`;

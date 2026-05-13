@@ -1,6 +1,8 @@
-// pre_ui — tasks tab (SPA hash #tasks): 统一混合时间线
-// 同时显示 mini_task + dispatch, 按 ts 倒序, accordion 展开 lazy fetch 详情.
-// 顶部 kind 过滤: 全部 / 仅 Mini / 仅 Dispatch (默认 全部).
+// pre_ui — tasks tab (SPA hash #tasks): dispatch 时间线
+// 当前 mini_task 特性整体隐藏 (per user); 此页只显示 dispatch, accordion 展开 lazy fetch.
+// 恢复 mini: (1) 恢复 .mode-bar 的 [仅 Mini] 标签 (2) refresh() 重新并行 A.miniTasks
+// (3) kindFilter 允许 'mini'. mini 渲染函数 (miniRowHTML / renderMiniTaskDetail / fillActions)
+// 仍保留供恢复.
 
 (function () {
   'use strict';
@@ -9,9 +11,6 @@
   const TEMPLATE = `
     <div class="tasks-wrap">
       <div class="mode-bar">
-        <span class="mode-tab" data-kind="all">全部</span>
-        <span class="mode-tab" data-kind="mini">仅 Mini</span>
-        <span class="mode-tab" data-kind="dispatch">仅 Dispatch</span>
         <span class="grow"></span>
         <button class="btn" id="btn-refresh">Refresh</button>
       </div>
@@ -26,57 +25,23 @@
     const list = document.getElementById('task-list');
     const refreshBtn = document.getElementById('btn-refresh');
 
-    // kind 过滤: all / mini / dispatch (per user: 不按 agent 过滤, 只切 kind)
-  let kindFilter = U.getParam('kind') || U.ssGet('tasks_kind', 'all');
-  if (!['all', 'mini', 'dispatch'].includes(kindFilter)) kindFilter = 'all';
-
-  let allItems = [];   // 合并的混合列表 (含 _kind + _ts 字段)
+  let allItems = [];   // dispatch 列表 (含 _kind + _ts 字段; _kind 始终 'dispatch')
   const detailCache = new Map();   // key = kind+':'+id
-
-  function renderKindTabs() {
-    document.querySelectorAll('.mode-tab').forEach(el => {
-      el.classList.toggle('active', el.dataset.kind === kindFilter);
-    });
-  }
-  document.querySelectorAll('.mode-tab').forEach(el => {
-    el.addEventListener('click', () => {
-      const k = el.dataset.kind;
-      if (k === kindFilter) return;
-      kindFilter = k;
-      U.ssSet('tasks_kind', k);
-      renderKindTabs();
-      renderList();
-    });
-  });
-  renderKindTabs();
 
   refreshBtn.addEventListener('click', refresh);
 
   async function refresh() {
     list.innerHTML = '<div class="dim p-12">loading...</div>';
     try {
-      // 并行拉两者, 合并按 ts 倒序. limit=200 全量给前端, 跨所有 agent 不过滤
-      const [miniR, dispR] = await Promise.all([
-        A.miniTasks({ limit: 200 }).catch(() => ({ mini_tasks: [] })),
-        A.dispatches().catch(() => ({ dispatches: [] })),
-      ]);
-      const minis = (miniR && miniR.mini_tasks) || [];
+      // mini 隐藏后只拉 dispatches
+      const dispR = await A.dispatches().catch(() => ({ dispatches: [] }));
       const disps = (dispR && dispR.dispatches) || [];
-      allItems = [
-        ...minis.map(mt => ({
-          _kind: 'mini',
-          _ts: mt.started_ts || 0,
-          _id: mt.mini_task_id,
-          data: mt,
-        })),
-        ...disps.map(d => ({
-          _kind: 'dispatch',
-          _ts: d.last_ts || d.started_ts || 0,
-          _id: d.dispatch_id,
-          data: d,
-        })),
-      ];
-      // 全局倒序: 最新在最上
+      allItems = disps.map(d => ({
+        _kind: 'dispatch',
+        _ts: d.last_ts || d.started_ts || 0,
+        _id: d.dispatch_id,
+        data: d,
+      }));
       allItems.sort((a, b) => b._ts - a._ts);
       renderList();
     } catch (e) {
@@ -86,32 +51,22 @@
   }
 
   function renderList() {
-    // 仅 kind 过滤 (per user: 不按 agent 过滤, 全部 agent 同时显示)
-    const filtered = kindFilter === 'all'
-      ? allItems
-      : allItems.filter(it => it._kind === kindFilter);
+    const filtered = allItems;
 
     if (!filtered.length) {
-      list.innerHTML = `<div class="dim p-12">无数据 (kind=${U.esc(kindFilter)})</div>`;
+      list.innerHTML = `<div class="dim p-12">无数据</div>`;
       return;
     }
 
     // 计数信息条 — 显示总条数 + 涉及的 agent 数
     const agentSet = new Set();
     filtered.forEach(it => {
-      if (it._kind === 'mini' && it.data.agent_id) agentSet.add(it.data.agent_id);
-      if (it._kind === 'dispatch') {
-        [it.data.ceo, it.data.dispatcher, it.data.executor, ...(it.data.managers || [])]
-          .filter(Boolean).forEach(a => agentSet.add(a));
-      }
+      [it.data.ceo, it.data.dispatcher, it.data.executor, ...(it.data.managers || [])]
+        .filter(Boolean).forEach(a => agentSet.add(a));
     });
-    const countMini = filtered.filter(it => it._kind === 'mini').length;
-    const countDisp = filtered.filter(it => it._kind === 'dispatch').length;
-    const summary = `<div class="dim" style="font-size:10px;padding:4px 0;">${filtered.length} 条 · ${countMini} mini · ${countDisp} dispatch · 涉及 ${agentSet.size} agent · 时间倒序</div>`;
+    const summary = `<div class="dim" style="font-size:10px;padding:4px 0;">${filtered.length} dispatch · 涉及 ${agentSet.size} agent · 时间倒序</div>`;
 
-    list.innerHTML = summary + filtered.map(it =>
-      it._kind === 'mini' ? miniRowHTML(it.data) : dispatchRowHTML(it.data)
-    ).join('');
+    list.innerHTML = summary + filtered.map(it => dispatchRowHTML(it.data)).join('');
 
     list.querySelectorAll('.task-item').forEach(el => {
       const head = el.querySelector('.ti-head');
