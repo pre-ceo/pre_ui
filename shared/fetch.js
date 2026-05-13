@@ -33,6 +33,43 @@
     }
   }
 
+  // Magic-link 一次性激活: pre 端 start_master.py / pre_token.py rotate 输出
+  //   http://127.0.0.1:5174/index.html#token=<raw>&next=/path
+  // token 走 URL fragment 不进 server log; 这里解析 → setToken → 清 hash 防 bookmark/
+  // history/转发泄露 → 跳 next. next 仅接受 '/' 开头的相对 path 或 '#' 开头的 hash,
+  // 防 javascript:/data: scheme 注入.
+  try {
+    const hash = global.location.hash || '';
+    if (hash.indexOf('token=') >= 0) {
+      const params = new URLSearchParams(hash.replace(/^#/, ''));
+      const tok = params.get('token');
+      const next = params.get('next') || '/';
+      if (tok && global.preUtils) {
+        global.preUtils.lsSet(TOKEN_KEY, tok);
+        try {
+          global.history.replaceState(null, '', global.location.pathname + global.location.search);
+        } catch (_) {}
+        // 跳 next: '#' 开头 → hash 路由; '/' 开头 → 相对 path; 其余忽略 (防 scheme 注入)
+        if (next && next !== '/') {
+          if (next.charAt(0) === '#') {
+            global.location.hash = next;
+          } else if (next.charAt(0) === '/') {
+            global.location.replace(next);
+          }
+        }
+        // toast 推到 DOMContentLoaded 后 — fetch.js IIFE 时 body 可能还没 ready
+        const showToast = () => global.preUtils.toast('token 已自动保存 (magic link)', 'ok');
+        if (global.document && global.document.body) {
+          setTimeout(showToast, 0);
+        } else {
+          global.document.addEventListener('DOMContentLoaded', showToast, { once: true });
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('[fetch] magic-link parse failed:', e);
+  }
+
   function getToken() {
     return (global.preUtils ? global.preUtils.lsGet(TOKEN_KEY, DEFAULT_TOKEN) : DEFAULT_TOKEN);
   }
