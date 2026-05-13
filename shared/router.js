@@ -10,10 +10,11 @@
 (function (global) {
   'use strict';
 
-  // 暂时收窄到 agents (其他 tab 在 index.html 已 HTML-comment 隐藏).
-  // 老 #home/#tasks/... deep-link 仍在 ALLOW 内, 可继续直链 (页面 JS 自带 init);
-  // 不在 tab-bar 出现只是不可见, 不影响 module 注册. 恢复全套 → 改回 TABS+DEFAULT 即可.
-  const TABS = ['agents'];
+  // 暂时收窄到 agents + usage + settings (settings 是首次启动设 token 的入口, 必须可见;
+  // 其他 tab 在 index.html 已 HTML-comment 隐藏). 老 #home/#tasks/... deep-link
+  // 仍在 ALLOW 内, 可继续直链 (页面 JS 自带 init); 不在 tab-bar 出现只是不可见,
+  // 不影响 module 注册. 恢复全套 → 改回 TABS+DEFAULT 即可.
+  const TABS = ['agents', 'usage', 'settings'];
   const ALLOW = new Set([
     'agents', 'home', 'tasks', 'dispatches', 'usage', 'notifications', 'settings', 'pending',
   ]);
