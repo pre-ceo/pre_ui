@@ -180,6 +180,14 @@
     notifyAudit: (params) =>
       _do('GET', apiUrl('notify/audit') + _qs(params || {})),
 
+    // 统一 audit 视图 (7 类 jsonl): mobile / telemetry / read_pane / agent_data /
+    //   caller_class / mcp / driver_decision. 见 pre dev-workflow features/260518-audit-api-unified
+    // /audit/kinds 返 KIND 元表 (无 IO), 给前端 tab + filter 动态渲染用
+    auditKinds: () => _do('GET', apiUrl('audit/kinds')),
+    // /audit/list?kind=&since=<unix>&limit=<1..500>&<filter>=...
+    // 后端 since 强制 ≥ now-30d, limit clamp [1,500]; 字段白名单 + redact 二次脱敏
+    auditList: (params) => _do('GET', apiUrl('audit/list') + _qs(params || {})),
+
     // 260429.X proposals (supervised stop → gemini 出 N 方案 → user 选/跳)
     chooseProposal: (agentId, proposalId) =>
       _do('POST', apiUrl('agents/' + encodeURIComponent(agentId) + '/choose-proposal'),

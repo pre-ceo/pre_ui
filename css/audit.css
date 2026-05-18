@@ -1,0 +1,48 @@
+/* audit — 复用 usage.css 的 .term-page / .node-tab / .usage-banner,
+   仅追加表格与控件标签样式. */
+
+/* ctrl-lbl: 内联的 "field:" 标签 (filters / since / limit 前缀) */
+#audit-controls .ctrl-lbl {
+  color: var(--dim);
+  font-size: 11px;
+  margin-right: 2px;
+  user-select: none;
+}
+/* substr/exact input 之间稍微留隙, 不挤成一团 */
+#audit-controls > * { margin-right: 2px; }
+#audit-controls input[type="text"],
+#audit-controls input[type="number"],
+#audit-controls select {
+  font-size: 11px;
+}
+
+/* truncated/fail banner — 复用 .usage-banner; 仅小调位置 (跟 controls 同 2ch 左缩进) */
+#audit-banner .usage-banner { margin-left: 2ch; }
+
+/* table: 密 11px monospace, ts 列等宽; tbody 行 hover 高亮 */
+.audit-tbl {
+  margin: 6px 0 0 2ch;
+  width: calc(100% - 2ch);
+  font-size: 11px;
+  table-layout: auto;
+}
+.audit-tbl th {
+  position: sticky;
+  top: 0;
+  background: var(--bg2);
+  z-index: 1;
+}
+.audit-tbl td {
+  white-space: normal;          /* 长字段允许 wrap */
+  word-break: break-word;
+  vertical-align: top;
+  max-width: 360px;             /* 单 cell 上限, 防一个 reason/preview 撑爆全表 */
+}
+.audit-tbl td[data-f="ts"] {
+  white-space: nowrap;
+  max-width: none;
+}
+.audit-tbl td .ts-cell { font-size: 11px; }
+.audit-tbl td .num { color: var(--blue); }
+.audit-tbl td .arr { color: var(--txt2); }
+.audit-tbl tbody tr:hover { background: var(--bgh); cursor: default; }
