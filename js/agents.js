@@ -58,11 +58,21 @@
     return (a.activity && a.activity.state) || a.state || 'unknown';
   }
 
-  // 排序: master 后端按 last_update DESC 排好 (stale 自然沉底), 前端不再重排.
-  // 仅做去重 + offline 容错 (seen 但本轮 live 没回的, 不删, 标 offline).
+  // 排序/ago 取 "最后活动时间": 优先 activity.last_activity_ts (registry 由 fingerprint
+  // state/last_action/tool/recent_actions/pane_summary 变就刷, 比 last_update 灵敏),
+  // fallback last_update. 用户偏好: 最近有动静的排最上, stale 不固定沉底.
+  function lastActivityTs(a) {
+    return (a && a.activity && a.activity.last_activity_ts) || (a && a.last_update) || null;
+  }
+  function parseLastUpdate(a) {
+    const v = lastActivityTs(a);
+    if (!v) return 0;
+    if (typeof v === 'number') return v;
+    const t = Date.parse(v);
+    return isNaN(t) ? 0 : t;
+  }
   function mergeFromMaster(liveList) {
     const liveIds = new Set(liveList.map(a => a.agent_id));
-    // 用 live 的顺序覆写 seen — Map 插入顺序保持, 之后用 live 顺序拿回 allAgents
     for (const a of liveList) seenAgents.set(a.agent_id, a);
     // seen 中不在 live 的, 标 offline (不删, 容错 master registry 启动期波动)
     for (const [id, prev] of seenAgents) {
@@ -77,14 +87,15 @@
         }
       }
     }
-    // 按 live 顺序输出 (master 已 last_update DESC 排序), live 没回的 offline agent
-    // 追加在末尾, 保持稳定 (避免突然消失再出现的 jitter).
-    const liveOrder = liveList.map(a => seenAgents.get(a.agent_id) || a);
-    const offlineTail = [];
-    for (const [id, info] of seenAgents) {
-      if (!liveIds.has(id)) offlineTail.push(info);
-    }
-    allAgents = liveOrder.concat(offlineTail);
+    const merged = Array.from(seenAgents.values());
+    merged.sort((a, b) => parseLastUpdate(b) - parseLastUpdate(a));
+    allAgents = merged;
+  }
+
+  // agent_id `<node>.<name>` → 短 name (`pre`, `pre_ui`); 无 `.` 时返回原值
+  function shortName(agentId) {
+    const parts = String(agentId || '').split('.');
+    return parts[parts.length - 1] || agentId || '';
   }
 
   function applyFilter() {
@@ -198,20 +209,24 @@
     const rowTitle = (st === 'stale' || st === 'failed') && fs
       ? `title="${U.esc((fs.reason || '') + (fs.hint ? ' — ' + fs.hint : ''))}"` : '';
     return `<div class="agent-row${rowMod}${a.agent_id === selectedId ? ' selected' : ''}" data-id="${U.esc(a.agent_id)}" data-state="${U.esc(st)}" ${rowTitle}>
-        <div class="id"><span class="td ${stateDotClass(st)}"></span>${U.esc(a.agent_id)}</div>
+        <div class="name-row">
+          <span class="td ${stateDotClass(st)}"></span>
+          <span class="agent-name">${U.esc(shortName(a.agent_id))}</span>
+        </div>
         <div class="meta">
           ${C.statePill(st)}
           ${zhChip}
           ${C.rolePill(a.role)}
           <span>node: ${U.esc(a.node_id || '-')}</span>
           <span class="grow"></span>
-          <span>${U.ago(a.last_update)}</span>
+          <span>${U.ago(lastActivityTs(a))}</span>
         </div>
         ${summaryLine}
         ${failureLine}
         ${nowLine}
         ${dispatchLine}
         ${miniTasksBtn}
+        <div class="agent-id-full">${U.esc(a.agent_id)}</div>
       </div>`;
   }
 
@@ -297,8 +312,8 @@
         row.classList.toggle('stale',  st === 'stale');
         row.classList.toggle('failed', st === 'failed');
         if (row.dataset.state !== st) row.dataset.state = st;
-        // .id 内的状态点 — 切换 td-* class
-        const dot = row.querySelector('.id .td');
+        // .name-row 内的状态点 — 切换 td-* class
+        const dot = row.querySelector('.name-row .td');
         if (dot) dot.className = 'td ' + stateDotClass(st);
         // .meta — 状态 pill + 中文 chip (stale/failed) + role + node + ago
         let zhChip = '';
@@ -306,7 +321,7 @@
         if (st === 'failed') zhChip = '<span class="chip-zh chip-failed">失败</span>';
         const meta = row.querySelector('.meta');
         if (meta) {
-          meta.innerHTML = `${C.statePill(st)}${zhChip}${C.rolePill(a.role)}<span>node: ${U.esc(a.node_id || '-')}</span><span class="grow"></span><span>${U.ago(a.last_update)}</span>`;
+          meta.innerHTML = `${C.statePill(st)}${zhChip}${C.rolePill(a.role)}<span>node: ${U.esc(a.node_id || '-')}</span><span class="grow"></span><span>${U.ago(lastActivityTs(a))}</span>`;
         }
         // failure-line: stale/failed 时显示 failure_reason, 否则移除
         const fs = failureSummary(a);

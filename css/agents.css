@@ -86,13 +86,28 @@
   background: var(--bg);
   border-left-color: var(--cyan);
 }
-.agent-row .id {
-  font-size: 11px;
-  color: var(--txt);
-  display: flex; align-items: center; gap: 6px;
-  font-weight: 500;
+/* name-row: 顶部大字 agent name (split('.').pop()) + 状态点; agent_id 完整版 → 底部 */
+.agent-row .name-row {
+  display: flex; align-items: center; gap: 8px;
+  line-height: 1.1;
 }
-.agent-row .id .td { margin: 0; flex-shrink: 0; }
+.agent-row .name-row .td { margin: 0; flex-shrink: 0; }
+.agent-row .agent-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--txt);
+  letter-spacing: -0.01em;
+  word-break: break-all;
+}
+.agent-row .agent-id-full {
+  order: 99;            /* 永远钉在 row 最末 (flex column), 不受 in-place appendChild 干扰 */
+  font-size: 9px;
+  color: var(--dim);
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .agent-row .meta { display: flex; gap: 6px; font-size: 10px; color: var(--dim); align-items: center; flex-wrap: wrap; }
 
 /* stale (未接管) — 整行 dim, 老 agent 沉底视觉信号 */
@@ -106,7 +121,7 @@
 }
 .agent-row.stale:hover { opacity: 0.85; background: var(--bgh); }
 .agent-row.stale.selected { opacity: 0.9; border-left-color: var(--cyan); }
-.agent-row.stale .id { color: var(--txt2); font-weight: normal; }
+.agent-row.stale .agent-name { color: var(--txt2); font-weight: 500; }
 
 /* failed — 配置坏, magenta 警示, 不 dim, 仍是 actionable */
 .agent-row.failed {
@@ -114,7 +129,7 @@
   background: rgba(201,48,199,0.04);
 }
 .agent-row.failed:hover { background: rgba(201,48,199,0.08); }
-.agent-row.failed .id { color: var(--magenta); }
+.agent-row.failed .agent-name { color: var(--magenta); }
 
 /* failure-line — 替代 stale/failed 时的 now-line, 显 failure_reason 短文本 */
 .agent-row .failure-line {
