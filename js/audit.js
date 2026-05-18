@@ -24,7 +24,8 @@
         <span class="grow"></span>
         <span class="m" id="audit-meta" style="font-size:11px;">-</span>
       </div>
-      <div id="audit-kind-tabs"></div>
+      <div id="audit-kind-tabs" class="audit-kind-chips"></div>
+      <div id="audit-kind-desc" class="audit-kind-desc">选 kind 看说明</div>
       <div id="audit-controls" class="if"></div>
       <div id="audit-banner"></div>
       <div id="audit-table-wrap"><div class="dim p-12">loading...</div></div>
@@ -33,6 +34,18 @@
   <span class="m">·</span> exact filter 选项随数据累积; substr 350ms debounce 后重拉
   <span class="m">·</span> 切 kind 重置 filter (不再属于该 kind 的字段不携带); URL #hash 与 filter 同步</pre>
     </div>`;
+
+  // 7 类 kind 的中文短名 + 长描述. backend desc 是英文且偏开发视角,
+  // 前端这层翻译成 CEO 视角的中文 (短名进 chip, 长描述进下方 desc 行).
+  const KIND_LABELS = {
+    mobile:          { zh: '通知派发',     long: '对外通知派发: agent → 用户的 mobile 推送 / webhook / cli sendkeys 投递记录' },
+    telemetry:       { zh: '节点遥测',     long: 'G11 各 node 周期上报状态, master 决定 accept / reject 的记录' },
+    read_pane:       { zh: '读 pane',     long: '跨 agent 读对方 tmux 当前画面 (G9) 审计 · raw_disclosed=true 表示返回了未脱敏原文' },
+    agent_data:     { zh: '读 transcript', long: 'transcript / file / sessions endpoint 的 read 审计 · 含返回字节数' },
+    caller_class:    { zh: 'HTTP 鉴权',    long: '每个进 master HTTP 的请求按 (role, path, source IP) 三元分类的 audit · 安全 incident 首站' },
+    mcp:             { zh: 'MCP 调用',     long: '各 agent 调 MCP 工具 (send_message / read_pane / fetch_inbox / ...) 记录 · args 只出 keys 不出 value' },
+    driver_decision: { zh: 'driver 决策',   long: 'claude / codex / gemini PreToolUse hook 的 governor 判定 (allow / deny / ask) 记录' },
+  };
 
   // since 选项 (秒). 后端 cap 30d, 这里上限即 30d.
   const SINCE_OPTS = [
@@ -129,6 +142,7 @@
     }
 
     const kindTabsEl  = document.getElementById('audit-kind-tabs');
+    const kindDescEl  = document.getElementById('audit-kind-desc');
     const controlsEl  = document.getElementById('audit-controls');
     const bannerEl    = document.getElementById('audit-banner');
     const tableWrapEl = document.getElementById('audit-table-wrap');
@@ -139,12 +153,18 @@
       return kinds.find(k => k.kind === activeKind) || null;
     }
 
-    // ---- 渲染: kind tabs (segmented control, 复用 usage.css .node-tab 样式) ----
+    // ---- 渲染: kind chips (双行: 英文 key + 中文短名; active = cyan border + 染色) ----
+    // chips 下方常显当前 kind 的中文长描述, 避免用户得 hover 才知道选项含义.
     function renderKindTabs() {
-      kindTabsEl.innerHTML = kinds.map(k =>
-        `<button class="node-tab ${k.kind === activeKind ? 'active' : ''}" data-kind="${U.esc(k.kind)}" title="${U.esc(k.desc)}">${U.esc(k.kind)}</button>`
-      ).join('');
-      kindTabsEl.querySelectorAll('.node-tab').forEach(el => {
+      kindTabsEl.innerHTML = kinds.map(k => {
+        const lbl = KIND_LABELS[k.kind] || { zh: '-', long: k.desc };
+        const cls = k.kind === activeKind ? 'audit-kind-chip active' : 'audit-kind-chip';
+        return `<button class="${cls}" data-kind="${U.esc(k.kind)}" title="${U.esc(k.desc)}">`
+             + `<span class="kind-en">${U.esc(k.kind)}</span>`
+             + `<span class="kind-zh">${U.esc(lbl.zh)}</span>`
+             + `</button>`;
+      }).join('');
+      kindTabsEl.querySelectorAll('.audit-kind-chip').forEach(el => {
         el.addEventListener('click', () => {
           const k = el.dataset.kind;
           if (k === activeKind) return;
@@ -152,12 +172,28 @@
           activeFilters = {};                 // 切 kind 重置 filter (不在新 kind 的字段不携带)
           if (kindLabelEl) kindLabelEl.textContent = k;
           renderKindTabs();
+          renderKindDesc();
           renderControls();
           writeHash();
           refresh();
         });
       });
       if (kindLabelEl) kindLabelEl.textContent = activeKind || '-';
+    }
+
+    // ---- 渲染: 当前 kind 的中文长描述行 (常显, 不用 hover) ----
+    function renderKindDesc() {
+      if (!kindDescEl) return;
+      const ko = currentKindObj();
+      if (!ko) {
+        kindDescEl.textContent = '选 kind 看说明';
+        return;
+      }
+      const lbl = KIND_LABELS[ko.kind];
+      const long = (lbl && lbl.long) || ko.desc;
+      // 双语呈现: 中文长描述 + 末尾灰色英文 backend desc (开发者参照)
+      kindDescEl.innerHTML = `<span class="desc-zh">${U.esc(long)}</span>`
+        + ` <span class="desc-en m">· ${U.esc(ko.desc)}</span>`;
     }
 
     // ---- 渲染: filter / since / limit 控件 (整行重建; 仅在 kind 切换时调用) ----
@@ -379,6 +415,7 @@
         }
       }
       renderKindTabs();
+      renderKindDesc();
       renderControls();
       writeHash();
       await refresh();
